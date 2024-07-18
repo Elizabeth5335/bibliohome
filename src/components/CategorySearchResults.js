@@ -1,20 +1,31 @@
 import React from "react";
 import BookList from "./BookList";
-import SearchBar from "./SearchBar";
+import { Link, useParams } from "react-router-dom";
+import { useBooks } from "../context/BooksContext";
 
 export default function CategorySearchResults(props) {
   const [filteredBooks, setFilteredBooks] = React.useState();
+  const { age, category } = useParams();
+  const { books, categories } = useBooks();
+
+  console.log(categories);
 
   React.useEffect(() => {
-      const filtered = props.books.children.children05;
+    if (books && books[age]) {
+      const filtered = books[age][category];
       setFilteredBooks(filtered);
+    }
   }, []);
 
   return (
-    <>
-    <button>На головну</button>
-      {/* <SearchBar></SearchBar> */}
-      {filteredBooks && <BookList books={filteredBooks}></BookList>}
-    </>
+    <div className="search-results">
+      <Link to={"/"} style={{ textDecoration: "none" }}>
+        <button>На головну</button>
+      </Link>
+
+      {categories && categories[age] && <h2>Книги категорії "{categories[age][category]}"</h2>}
+
+      {filteredBooks ? <BookList books={filteredBooks}></BookList> : "Немає книг заданої категорії"}
+    </div>
   );
 }
