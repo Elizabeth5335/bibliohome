@@ -110,14 +110,20 @@ h2{
   padding: 0;
 }
 
-.search-wrapper input[type="text"] {
+input {
   border: 2px solid #d5bdaf;
-  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  padding: 0.5rem 1rem;
   border-radius: 16px;
   box-shadow: 2px 2px 5px #d6ccc2;
   margin: 0.5rem;
-  min-width: min(50vw, 400px);
+  width: 400px;
   transition: background 0.3s, border-color 0.3s;
+}
+
+.search-wrapper input[type="text"] {
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  min-width: min(50vw, 400px);
+
 }
 
 .search-wrapper input[type="text"]:focus {
@@ -160,4 +166,32 @@ h2{
   .App{
     padding: 1rem;
   }
+}
+
+
+/* login */
+
+.login{
+  text-align: center;
+  justify-content: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0 2rem;
+}
+
+.column{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.login input{
+  max-width: 300px;
+}
+
+.login h2{
+  margin-bottom: 2rem;
 }
