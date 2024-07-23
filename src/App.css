@@ -1,38 +1,163 @@
-.App {
+*{
+  margin: 0;
+  padding: 0;
+}
+
+body{
+  background-color: #f5ebe0;
+}
+
+.App{
   text-align: center;
+  padding: 3rem;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+section{
+  /* border-block: 1px solid #7b6152; */
+  max-width: 1024px;
+  padding: 2rem 2rem;
+  margin: 3rem auto;
+  box-shadow: 2px 2px 5px #7b6152;
+  border-radius: 16px;
+  /* background-color: #f5ebe0; */
+}
+button{
+  border: none;
+  padding: 0.5rem 1rem;
+  background-color: #d5bdaf;
+  margin: 0.5rem;
+  border-radius: 16px;
+  box-shadow: 2px 2px 5px #d6ccc2;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+button:hover{
+  background-color: #e3d5ca;
+  cursor: pointer;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+a{
+  text-decoration: none;
+}
+
+h2{
+  margin-bottom: 1rem;
+}
+
+#main-heading{
+  margin-bottom: 3rem;
+}
+
+.logo{
+  max-height: 6rem;
+  margin: auto;
+  margin-bottom: 0.75rem;
+}
+
+.main-text{
+  margin: auto;
+  margin-bottom: 2rem;
+}
+
+.tabs {
+  padding-bottom: 1rem;
+  max-width: 700px;
+  margin: auto;
+  border-bottom: 1px solid #7b6152;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  gap: 3rem;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+
 }
 
-.App-link {
-  color: #61dafb;
+.tabs button {
+  background: #d5bdaf;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.tabs button.active {
+  background: #edede9;
+  cursor:inherit;
+}
+
+.tabs button:hover:not(.active) {
+  background: #e3d5ca;
+
+}
+
+.content ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 700px;
+  margin: 1rem auto;
+  padding: 0;
+}
+
+.content button {
+  transition: background 0.3s;
+}
+
+/* ---------INPUT--------------- */
+
+
+.search-wrapper {
+  position: relative;
+  display: inline-block;
+  padding: 0;
+}
+
+.search-wrapper input[type="text"] {
+  border: 2px solid #d5bdaf;
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  border-radius: 16px;
+  box-shadow: 2px 2px 5px #d6ccc2;
+  margin: 0.5rem;
+  min-width: min(50vw, 400px);
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.search-wrapper input[type="text"]:focus {
+  border-color: #e3d5ca;
+  outline: none;
+}
+
+.search-wrapper input[type="text"]::placeholder {
+  color: #a09b94;
+}
+
+.search-wrapper button {
+  position: absolute;
+  top: 1rem;
+  right: 0px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  padding: 0;
+  height: 3rem;
+  width: 3rem;
+  border: none;
+  background: #7b6152;
+  color: #edede9;
+  border-radius: 50%;
+
+  i{
+    color: #edede9;
   }
-  to {
-    transform: rotate(360deg);
+}
+
+.search-wrapper button:hover {
+  color: #d5bdaf;
+}
+
+
+
+/* --------- MOBILE----------- */
+
+@media screen and (max-width: 756px) {
+  .App{
+    padding: 1rem;
   }
 }

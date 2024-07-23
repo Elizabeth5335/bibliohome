@@ -7,15 +7,11 @@ export default function CategoryList(props) {
   const { categories } = useBooks();
 
   return (
-    <>
+    <section>
       <h2>Пошук за категорією</h2>
       <div>
-        <div
-          className="tabs"
-          style={{ paddingBottom: "1rem", borderBottom: "1px solid grey" }}
-        >
+        <div className="tabs">
           <button
-            style={{ marginRight: "3rem", background: "dark-grey" }}
             className={activeTab === "adult" ? "active" : ""}
             onClick={() => setActiveTab("adult")}
           >
@@ -30,22 +26,12 @@ export default function CategoryList(props) {
         </div>
         {categories && (
           <div className="content">
-            <ul
-              style={{
-                listStyle: "none",
-                display: "flex",
-                flexWrap: "wrap",
-                maxWidth: "700px",
-                margin: "1rem auto",
-              }}
-            >
-
+            <ul>
               {Object.entries(categories[activeTab]).map(([key, category]) => {
                 return (
                   <li key={key}>
                     <Link
                       to={`/books/${activeTab}/${key}`}
-                      style={{ textDecoration: "none" }}
                     >
                       <button>{category}</button>
                     </Link>
@@ -56,6 +42,6 @@ export default function CategoryList(props) {
           </div>
         )}
       </div>
-    </>
+    </section>
   );
 }

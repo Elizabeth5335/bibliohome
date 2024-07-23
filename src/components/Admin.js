@@ -75,7 +75,7 @@ export default function Admin() {
             <button onClick={logOut}>Log out</button>
           </div>
           <div>
-            <h2>Інструменти бабліотекаря:</h2>
+            <h2>Інструменти бібліотекаря:</h2>
             <Link to="/add">
               <button>Додати книгу</button>
             </Link>
