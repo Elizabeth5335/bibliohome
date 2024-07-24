@@ -195,3 +195,27 @@ input {
 .login h2{
   margin-bottom: 2rem;
 }
+
+
+/* -------ADMIN----------- */
+
+
+#admin{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 0 3rem;
+  text-align: center;
+}
+
+.bottom-buttons{
+  border-top: 2px solid #7b6152;
+  padding-top: 3rem;
+  margin-top: 3rem;
+}
+
+#admin h2{
+  margin-bottom: 2rem;
+}

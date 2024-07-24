@@ -64,18 +64,11 @@ export default function Admin() {
       });
   }
   return (
-    <>
+    <div id="admin">
       {isLoggedIn ? (
         <div>
           <div>
-            <h2>Змінити пароль</h2>
-            <button onClick={resetPassword}>Змінити пароль</button>
-          </div>
-          <div>
-            <button onClick={logOut}>Log out</button>
-          </div>
-          <div>
-            <h2>Інструменти бібліотекаря:</h2>
+            <h2>Інструменти бібліотекаря</h2>
             <Link to="/add">
               <button>Додати книгу</button>
             </Link>
@@ -86,10 +79,14 @@ export default function Admin() {
               <button>Видалити книгу</button>
             </Link>
           </div>
+          <div className="bottom-buttons">
+            <button onClick={resetPassword}>Змінити пароль</button>
+            <button onClick={logOut}>Log out</button>
+          </div>
         </div>
       ) : (
         <NoAccessMessage />
       )}
-    </>
+    </div>
   );
 }
