@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getDatabase, ref, push, get, child } from "firebase/database";
+import { getDatabase, ref, push, update, get, child } from "firebase/database";
 import {
   getStorage,
   ref as storageRef,
@@ -31,6 +31,8 @@ export default function AddBook() {
     setCoverImage(e.target.files[0]);
   };
 
+  console.log("books");
+  console.log(books);
   const handleAdditionalImagesChange = (e) => {
     setAdditionalImages([...e.target.files]);
   };
@@ -41,27 +43,35 @@ export default function AddBook() {
     return getDownloadURL(imageRef);
   };
 
-  const checkBookExists = async (bookName) => { //not working
-    console.log("books");
-    console.log(books);
+  const checkBookExists = (bookName) => {
     return (
-      Object.values(books).some(
+      Object.values(books)?.filter(
         (book) => book?.name?.toLowerCase() === bookName?.toLowerCase()
-      ) || false
+      ).length !== 0
     );
   };
 
-  const addBook = async (e) => {
+  // function setId(){
+  // console.log(categories.valueOf(category));
+  // console.log(categories.valueOf(category));
+  // Object.keys(categories.adult).map((cat) => (
+  //   <option key={cat} className={cat} value={`adult/${cat}`}>
+  //     {categories.adult[cat]}
+  //   </option>
+  // ))}
+  // }
+
+  const addBook = (e) => {
     e.preventDefault();
-    if (await checkBookExists(name)) {
+    if (checkBookExists(name)) {
       window.alert(
-        "Книга вже існує. Видаліть/відредагуйте її або зверніться до Лізи, щоб виправити помилку."
+        "Книга з такою назвою вже існує. Видаліть/відредагуйте її або зверніться до Лізи, щоб виправити помилку."
       );
       return;
     }
     try {
-      const coverImageUrl = await uploadImage(coverImage);
-      const additionalImagesUrls = await Promise.all(
+      const coverImageUrl = uploadImage(coverImage);
+      const additionalImagesUrls = Promise.all(
         additionalImages.map((image) => uploadImage(image))
       );
 
@@ -76,9 +86,8 @@ export default function AddBook() {
         price,
       };
 
-      const booksRef = ref(db, `books/${category.includes("adult")||category.includes("children") ? category : `adult/${category}`}`);
-      await push(booksRef, newBook);
-
+      const booksRef = ref(db, `books/${id}`);
+      update(booksRef, newBook);
       updateBooks();
 
       window.alert("Книга додана успішно!");
@@ -112,8 +121,8 @@ export default function AddBook() {
               <input
                 type="text"
                 value={id}
-                onChange={(e) => setId(e.target.value)}
-                required
+                disabled
+                // required
               />
             </div>
             <div className="form-field">
@@ -146,23 +155,32 @@ export default function AddBook() {
               <input
                 type="text"
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => {
+                  setId(
+                    Object.keys(categories).find(
+                      (key) => categories[key] === e.target.value
+                    ) +
+                      "-" +
+                      Date.now()
+                  );
+                  return setCategory(e.target.value);
+                }}
                 list="category-options"
                 required
               />
               <datalist id="category-options">
                 {categories &&
-                  Object.keys(categories.adult).map((cat) => (
-                    <option key={cat} className={cat} value={`adult/${cat}`}>
-                      {categories.adult[cat]}
+                  Object.entries(categories).map(([cat, val]) => (
+                    <option key={cat} value={val}>
+                      {categories[cat]}
                     </option>
                   ))}
-                {categories &&
-                  Object.keys(categories.children).map((cat) => (
-                    <option key={cat} className={cat} value={`children/${cat}`}>
+                {/* {categories &&
+                  Object.entries(categories.children).map(([cat, val]) => (
+                    <option key={cat} value={cat}>
                       {categories.children[cat]}
                     </option>
-                  ))}
+                  ))} */}
               </datalist>
             </div>
             <div className="form-field price">
