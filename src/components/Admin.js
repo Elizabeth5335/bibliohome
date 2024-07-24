@@ -57,6 +57,7 @@ export default function Admin() {
 
     signOut(auth)
       .then(() => {
+        localStorage.setItem('user', JSON.stringify(null));
         navigate("/login");
       })
       .catch((error) => {

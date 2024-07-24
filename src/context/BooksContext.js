@@ -35,9 +35,16 @@ export function BooksProvider({ children }) {
     });
   }, []);
 
+  const updateBooks = () =>{
+    onValue(booksRef, (snapshot) => {
+      const data = snapshot.val();
+      setBooks(data);
+    });
+  }
   const values = {
     books,
     categories,
+    updateBooks
   };
 
   return (

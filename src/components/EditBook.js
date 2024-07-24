@@ -1,8 +1,14 @@
 import { getAuth } from "firebase/auth";
 import NoAccessMessage from "./NoAccessMessage";
+import { Link } from "react-router-dom";
+
 
 export default function EditBook() {
   const auth = getAuth();
   const user = auth.currentUser;
-  return <>{user ? <div>Edit book</div> : <NoAccessMessage />}</>;
+  return <>{user ? <div>
+    <Link to={"/admin"} style={{ textDecoration: "none", alignSelf: "start" }}>
+        <button>Назад</button>
+      </Link>
+      Edit book</div> : <NoAccessMessage />}</>;
 }

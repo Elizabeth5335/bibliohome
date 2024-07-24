@@ -1,23 +1,3 @@
-// import React from "react";
-// import CategoryList from "./CategoryList";
-// import SearchBar from "./SearchBar";
-// import RandomBook from "./RandomBook";
-// import { getDatabase, ref, onValue } from "firebase/database";
-// import CategorySearchResults from "./CategorySearchResults";
-
-// export default function Login() {
-
-//   return (
-//     <div className="App">
-//       <h1>Вітаю, Валеріє</h1>
-//       <h2>Підтвердіть свою особистість</h2>
-
-//     </div>
-//   );
-// }
-
-// Login.js
-
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
@@ -38,6 +18,7 @@ export default function Login() {
         // Signed in
         const user = userCredential.user;
         if (user) {
+          localStorage.setItem('user', JSON.stringify(user));
           navigate("/admin");
         }
       })
@@ -46,15 +27,6 @@ export default function Login() {
         setError(errorMessage);
       });
   }
-  // e.preventDefault();
-  // try {
-  //   await signInWithEmailAndPassword(auth, email, password);
-  //   await signInWith(auth, email, password);
-  //   window.alert("success");
-  //   return redirect("/admin");
-  // } catch (error) {
-  //   setError(error.message);
-  // }
 
   return (
     <div className="login">
@@ -71,7 +43,7 @@ export default function Login() {
           />
         </div>
         <div className="column">
-          <label>Password</label>
+          <label>Пароль</label>
           <input
             type="password"
             value={password}

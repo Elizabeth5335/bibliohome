@@ -110,7 +110,7 @@ h2{
   padding: 0;
 }
 
-input {
+input, textarea {
   border: 2px solid #d5bdaf;
   padding: 0.5rem 1rem;
   border-radius: 16px;
@@ -218,4 +218,34 @@ input {
 
 #admin h2{
   margin-bottom: 2rem;
+}
+
+
+/* -------ADD BOOK----------- */
+
+.add-book{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  h2{
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  button{
+    align-self: center;
+  }
+}
+.form-field{
+  display: flex;
+  flex-direction: column;
+}
+
+.price input{
+  width: 100px;
+}
+.form-field textarea{
+  height: 250px;
 }
