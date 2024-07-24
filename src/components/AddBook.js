@@ -31,8 +31,21 @@ export default function AddBook() {
     setCoverImage(e.target.files[0]);
   };
 
-  console.log("books");
-  console.log(books);
+  const [mergedCats, setMergedCats] = React.useState();
+
+  React.useEffect(() => {
+    console.log("categories.adults");
+    console.log(categories?.adults);
+    if (categories) {
+      // const adultCats = Object.entries(categories?.adults || {});
+      const adultCats = categories?.adults;
+      // const childCats = Object.entries(categories?.children || {});
+      const childCats = categories?.children;
+
+      setMergedCats({ ...adultCats, ...childCats });
+    }
+  }, [categories]);
+
   const handleAdditionalImagesChange = (e) => {
     setAdditionalImages([...e.target.files]);
   };
@@ -51,15 +64,12 @@ export default function AddBook() {
     );
   };
 
-  // function setId(){
-  // console.log(categories.valueOf(category));
-  // console.log(categories.valueOf(category));
-  // Object.keys(categories.adult).map((cat) => (
-  //   <option key={cat} className={cat} value={`adult/${cat}`}>
-  //     {categories.adult[cat]}
-  //   </option>
-  // ))}
-  // }
+  function newId(e) {
+    const tmp = Object.keys(mergedCats).find(
+      (key) => mergedCats[key] === e.target.value
+    );
+    return tmp ? tmp + "-" + Date.now() : Date.now();
+  }
 
   const addBook = (e) => {
     e.preventDefault();
@@ -156,12 +166,10 @@ export default function AddBook() {
                 type="text"
                 value={category}
                 onChange={(e) => {
+                  console.log("merged");
+                  console.log(mergedCats);
                   setId(
-                    Object.keys(categories).find(
-                      (key) => categories[key] === e.target.value
-                    ) +
-                      "-" +
-                      Date.now()
+                    newId(e)
                   );
                   return setCategory(e.target.value);
                 }}
@@ -169,10 +177,10 @@ export default function AddBook() {
                 required
               />
               <datalist id="category-options">
-                {categories &&
-                  Object.entries(categories).map(([cat, val]) => (
+                {mergedCats &&
+                  Object.entries(mergedCats).map(([cat, val]) => (
                     <option key={cat} value={val}>
-                      {categories[cat]}
+                      {mergedCats[cat]}
                     </option>
                   ))}
                 {/* {categories &&
