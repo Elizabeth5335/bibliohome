@@ -160,13 +160,6 @@ input, textarea {
 
 
 
-/* --------- MOBILE----------- */
-
-@media screen and (max-width: 756px) {
-  .App{
-    padding: 1rem;
-  }
-}
 
 
 /* login */
@@ -248,4 +241,79 @@ input, textarea {
 }
 .form-field textarea{
   height: 250px;
+}
+
+
+/* delete book */
+
+.bookCoverDelete{
+  max-height: 150px;
+  max-width: 300px;
+}
+
+.delete{
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  button{
+    margin-bottom: 2rem;
+  }
+
+  p{
+    margin: 1rem;
+  }
+
+  .bookContainer{
+    border: 1px solid #7b6152;
+    padding: 1rem;
+    margin: 1rem;
+  }
+
+  .form{
+    margin: auto;
+  }
+}
+
+.outContainer{
+  padding: 3rem;
+}
+
+
+
+/* --------- MOBILE----------- */
+
+@media screen and (max-width: 756px) {
+  .App{
+    padding: 1rem;
+  }
+
+  .outContainer{
+    padding: 1rem;
+  }
+  .delete{
+    padding: 1rem;
+    max-width: 100vw;
+    
+
+    div{
+      max-width: 100%;
+    }
+
+    input{
+      width: auto;
+    }
+
+    img{
+      max-width: 100%;
+    }
+
+    .results{
+      width: 100%;
+    }
+    .bookContainer{
+      width: auto;
+    }
+  }
 }
