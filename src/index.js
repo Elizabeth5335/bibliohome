@@ -10,6 +10,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./components/Login";
 import Admin from "./components/Admin";
 import AddBook from "./components/AddBook";
+import Book from "./components/Book";
 import EditBook from "./components/EditBook";
 import DeleteBook from "./components/DeleteBook";
 import SearchResults from "./components/SearchResults";
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
   {
     path: "/edit/:bookId",
     element: <EditBookById />,
+  },
+  {
+    path: "/book/:bookId",
+    element: <Book />,
   },
   {
     path: "/login",

@@ -20,7 +20,7 @@ export default function CategorySearchResults(props) {
   }, []);
 
   return (
-    <div className="search-results">
+    <div className="search-results outContainer">
       <Link to={"/"} style={{ textDecoration: "none" }}>
         <button>На головну</button>
       </Link>

@@ -30,7 +30,7 @@ export default function SearchResults(props) {
         let flag = false;
         nameParts?.map((part) => {
           const distance = levenshtein(part, searchLower);
-          if (distance <= MIN_DISTANCE) flag = true;
+          if (distance <= MIN_DISTANCE && !book.name?.toLowerCase().includes(searchLower)) flag = true;
         });
         return flag;
       });
@@ -46,7 +46,7 @@ export default function SearchResults(props) {
         const splitAuthor = book.author?.toLowerCase().split(" ");
         splitAuthor?.map((name) => {
           const distance = levenshtein(name, searchLower);
-          if (distance <= MIN_DISTANCE) flag = true;
+          if (distance <= MIN_DISTANCE && !book.author?.toLowerCase().includes(searchLower)) flag = true;
         });
         return flag;
       });
@@ -88,7 +88,7 @@ export default function SearchResults(props) {
   };
 
   return (
-    <div className="search-results">
+    <div className="search-results outContainer">
       <Link to={"/"} style={{ textDecoration: "none" }}>
         <button>На головну</button>
       </Link>

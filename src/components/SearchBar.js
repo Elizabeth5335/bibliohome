@@ -10,7 +10,11 @@ export default function SearchBar() {
 
   function handleSearch(e) {
     e.preventDefault();
-    navigate(`/books/${searchTerm}`);
+    if (searchTerm !== "") {
+      navigate(`/books/${searchTerm}`);
+    } else {
+      alert("Спершу введіть назву або автора!");
+    }
   }
 
   return (
