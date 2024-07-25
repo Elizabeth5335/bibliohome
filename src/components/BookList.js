@@ -5,12 +5,18 @@ export default function BookList(props) {
   return (
     <div
       className="bookList"
-      style={{ display: "flex", flexWrap: "wrap", maxWidth: "700px", margin: "auto"}}
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        maxWidth: "700px",
+        margin: "auto",
+      }}
     >
       {props.books ? (
         props.books.map((book) => {
           return (
             <BookCard
+              key={book.id}
               name={book.name}
               author={book.author}
               price={book.price}

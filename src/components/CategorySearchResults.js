@@ -11,8 +11,10 @@ export default function CategorySearchResults(props) {
   console.log(categories);
 
   React.useEffect(() => {
-    if (books && books[age]) {
-      const filtered = books[age][category];
+    if (books) {
+      const filtered = Object.values(books).filter(
+        (book) => book.category === categories[age][category]
+      );
       setFilteredBooks(filtered);
     }
   }, []);
@@ -23,9 +25,15 @@ export default function CategorySearchResults(props) {
         <button>На головну</button>
       </Link>
 
-      {categories && categories[age] && <h2>Книги категорії "{categories[age][category]}"</h2>}
+      {categories && categories[age] && (
+        <h2>Книги категорії "{categories[age][category]}"</h2>
+      )}
 
-      {filteredBooks ? <BookList books={filteredBooks}></BookList> : "Немає книг заданої категорії"}
+      {filteredBooks?.length > 0 ? (
+        <BookList books={filteredBooks}></BookList>
+      ) : (
+        "Немає книг заданої категорії"
+      )}
     </div>
   );
 }

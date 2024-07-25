@@ -3,7 +3,7 @@ import { useBooks } from "../context/BooksContext";
 import { Link } from "react-router-dom";
 
 export default function CategoryList(props) {
-  const [activeTab, setActiveTab] = React.useState("adult");
+  const [activeTab, setActiveTab] = React.useState(JSON.parse(localStorage.getItem("activeTab"))||"adults");
   const { categories } = useBooks();
 
   return (
@@ -12,14 +12,18 @@ export default function CategoryList(props) {
       <div>
         <div className="tabs">
           <button
-            className={activeTab === "adult" ? "active" : ""}
-            onClick={() => setActiveTab("adult")}
+            className={activeTab === "adults" ? "active" : ""}
+            onClick={() => {
+              localStorage.setItem('activeTab', JSON.stringify("adults"));
+              return setActiveTab("adults")}}
           >
             Дорослі
           </button>
           <button
             className={activeTab === "children" ? "active" : ""}
-            onClick={() => setActiveTab("children")}
+            onClick={() => {
+              localStorage.setItem('activeTab', JSON.stringify("children"));
+              return setActiveTab("children")}}
           >
             Діти
           </button>
