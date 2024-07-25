@@ -27,16 +27,16 @@ export default function EditBookById() {
 
   const [book, setBook] = React.useState(findBook());
 
-  const [name, setName] = React.useState(book?.name);
+  const [name, setName] = React.useState(book?.name|| "");
   const [id, setId] = React.useState(book?.id);
-  const [author, setAuthor] = React.useState(book?.author);
-  const [category, setCategory] = React.useState(book?.category);
-  const [description, setDescription] = React.useState(book?.description);
+  const [author, setAuthor] = React.useState(book?.author|| "");
+  const [category, setCategory] = React.useState(book?.category|| "");
+  const [description, setDescription] = React.useState(book?.description || "");
   const [additionalImages, setAdditionalImages] = React.useState(
-    book?.additionalImages
+    book?.additionalImages || []
   );
-  const [price, setPrice] = React.useState(book?.price);
-  const [coverImage, setCoverImage] = React.useState(book?.url);
+  const [price, setPrice] = React.useState(book?.price|| "");
+  const [coverImage, setCoverImage] = React.useState(book?.url|| "");
   // const [coverImageURL, setCoverImageURL] = React.useState(book?.url);
   const [loading, setLoading] = React.useState(false);
 
@@ -88,7 +88,7 @@ export default function EditBookById() {
     try {
       const coverImageUrl = await uploadImage(coverImage)
       const additionalImagesUrls = await Promise.all(
-        additionalImages && additionalImages.map((image) => uploadImage(image))
+        additionalImages && (additionalImages|| []).map((image) => uploadImage(image))
       );
 
       const updatedBook = {

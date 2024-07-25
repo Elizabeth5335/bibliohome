@@ -19,9 +19,9 @@ export default function EditBook() {
       const bookList = Object.values(books) || [];
 
       if (id) {
-        return bookList.filter((book) => book.id.toLowerCase().includes(id.toLowerCase()));
+        return bookList.filter((book) => book.id?.toLowerCase().includes(id?.toLowerCase()));
       } else if (name) {
-        return bookList.filter((book) => book.name.toLowerCase().includes(name.toLowerCase()));
+        return bookList.filter((book) => book.name?.toLowerCase().includes(name?.toLowerCase()));
       } else {
         return null;
       }
