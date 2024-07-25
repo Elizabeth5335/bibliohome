@@ -34,7 +34,7 @@ export default function DeleteBook() {
     setFilteredBooks(findBook);
   }, [bookId, name]);
 
-  const deleteBook = async (idToDelete) => {
+ const deleteBook = async (idToDelete) => {
     setLoading(true);
     try {
       const bookRef = ref(db, `books/${idToDelete}`);

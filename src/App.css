@@ -251,7 +251,7 @@ input, textarea {
   max-width: 300px;
 }
 
-.delete{
+.delete, .edit{
   padding: 3rem;
   display: flex;
   flex-direction: column;

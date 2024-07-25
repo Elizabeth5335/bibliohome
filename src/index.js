@@ -13,6 +13,7 @@ import AddBook from "./components/AddBook";
 import EditBook from "./components/EditBook";
 import DeleteBook from "./components/DeleteBook";
 import SearchResults from "./components/SearchResults";
+import EditBookById from "./components/EditBookById";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
   {
     path: "/books/:searchTerm",
     element: <SearchResults />,
+  },
+  {
+    path: "/edit/:bookId",
+    element: <EditBookById />,
   },
   {
     path: "/login",

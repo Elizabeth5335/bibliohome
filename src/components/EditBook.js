@@ -1,120 +1,41 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { getDatabase, ref, push, update, get, child } from "firebase/database";
-import {
-  getStorage,
-  ref as storageRef,
-  uploadBytes,
-  getDownloadURL,
-} from "firebase/storage";
+import { Link, useNavigate } from "react-router-dom";
 import NoAccessMessage from "./NoAccessMessage";
 import { useBooks } from "../context/BooksContext";
-import { db, storage } from "../firebaseConfig";
 
 export default function EditBook() {
-
-  const [bookId, setBookId] = React.useState();
-  
   const [user, setUser] = React.useState(
     JSON.parse(localStorage.getItem("user")) || null
   );
   const [name, setName] = React.useState("");
-  const [author, setAuthor] = React.useState("");
   const [id, setId] = React.useState("");
-  const [category, setCategory] = React.useState("");
-  const [description, setDescription] = React.useState("");
-  const [additionalImages, setAdditionalImages] = React.useState([]);
-  const [price, setPrice] = React.useState("");
-  const [coverImage, setCoverImage] = React.useState(null);
 
-  const { categories, books, updateBooks } = useBooks();
-  const handleCoverImageChange = (e) => {
-    setCoverImage(e.target.files[0]);
-  };
+  const [filteredBooks, setFilteredBooks] = React.useState();
 
-  const [mergedCats, setMergedCats] = React.useState();
+  const { books } = useBooks();
 
-  React.useEffect(() => {
-    console.log("categories.adults");
-    console.log(categories?.adults);
-    if (categories) {
-      const adultCats = categories?.adults;
-      const childCats = categories?.children;
+  function findBook() {
+    if (books) {
+      const bookList = Object.values(books) || [];
 
-      setMergedCats({ ...adultCats, ...childCats });
+      if (id) {
+        return bookList.filter((book) => book.id.toLowerCase().includes(id.toLowerCase()));
+      } else if (name) {
+        return bookList.filter((book) => book.name.toLowerCase().includes(name.toLowerCase()));
+      } else {
+        return null;
+      }
     }
-  }, [categories]);
-
-  const handleAdditionalImagesChange = (e) => {
-    setAdditionalImages([...e.target.files]);
-  };
-
-  const uploadImage = async (image) => {
-    const imageRef = storageRef(storage, `images/${image?.name}`);
-    await uploadBytes(imageRef, image);
-    return getDownloadURL(imageRef);
-  };
-
-  const checkBookExists = (bookName) => {
-    return (
-      Object.values(books)?.filter(
-        (book) => book?.name?.toLowerCase() === bookName?.toLowerCase()
-      ).length !== 0
-    );
-  };
-
-  function newId(e) {
-    const tmp = Object.keys(mergedCats).find(
-      (key) => mergedCats[key] === e.target.value
-    );
-    return tmp ? tmp + "-" + Date.now() : Date.now();
   }
 
-  const addBook = (e) => {
-    e.preventDefault();
-    if (checkBookExists(name)) {
-      window.alert(
-        "Книга з такою назвою вже існує. Видаліть/відредагуйте її або зверніться до Лізи, щоб виправити помилку."
-      );
-      return;
-    }
-    try {
-      const coverImageUrl = uploadImage(coverImage);
-      const additionalImagesUrls = Promise.all(
-        additionalImages.map((image) => uploadImage(image))
-      );
+  React.useEffect(() => {
+    setFilteredBooks(findBook);
+  }, [id, name]);
 
-      const newBook = {
-        id,
-        name,
-        author,
-        description,
-        category,
-        url: coverImageUrl,
-        additionalImages: additionalImagesUrls,
-        price,
-      };
-
-      const booksRef = ref(db, `books/${id}`);
-      update(booksRef, newBook);
-      updateBooks();
-
-      window.alert("Книга додана успішно!");
-      setId("");
-      setName("");
-      setAuthor("");
-      setDescription("");
-      setCategory("");
-      setCoverImage("");
-      setAdditionalImages("");
-      setPrice("");
-    } catch (error) {
-      window.alert("Сталася помилка!", error);
-    }
-  };
+  const navigate = useNavigate();
 
   return (
-    <div className="add-book">
+    <div>
       <Link
         to={"/admin"}
         style={{ textDecoration: "none", alignSelf: "start" }}
@@ -122,104 +43,75 @@ export default function EditBook() {
         <button>Назад</button>
       </Link>
       {user ? (
-        <div>
-          <h2>Редагування книги</h2>
+        <div className="edit">
+          <div className="form">
+            <h2>Редагування книги</h2>
 
-          <>Find the book</>
-          <form onSubmit={addBook}>
-            <div className="form-field">
-              <label>id</label>
-              <input
-                type="text"
-                value={id}
-                disabled
-                // required
-              />
-            </div>
-            <div className="form-field">
-              <label>Назва</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-field">
-              <label>Автор</label>
-              <input
-                type="text"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-              />
-            </div>
-            <div className="form-field">
-              <label>Опис</label>
-              <textarea
-                type="text"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
-            <div className="form-field">
-              <label>Категорія</label>
-              <input
-                type="text"
-                value={category}
-                onChange={(e) => {
-                  console.log("merged");
-                  console.log(mergedCats);
-                  setId(newId(e));
-                  return setCategory(e.target.value);
-                }}
-                list="category-options"
-                required
-              />
-              <datalist id="category-options">
-                {mergedCats &&
-                  Object.entries(mergedCats).map(([cat, val]) => (
-                    <option key={cat} value={val}>
-                      {mergedCats[cat]}
-                    </option>
-                  ))}
-                {/* {categories &&
-                  Object.entries(categories.children).map(([cat, val]) => (
-                    <option key={cat} value={cat}>
-                      {categories.children[cat]}
-                    </option>
-                  ))} */}
-              </datalist>
-            </div>
-            <div className="form-field price">
-              <label>Вартість прокату</label>
-              <div>
+            <form onSubmit={findBook}>
+              <div className="form-field">
+                <label>id</label>
                 <input
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  type="text"
+                  value={id}
+                  onChange={(e) => setId(e.target.value)}
                 />
-                <span>zł</span>
               </div>
+              <div className="form-field">
+                <label>Назва</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <button type="submit">Знайти книгу</button>
+            </form>
+          </div>
+          {filteredBooks?.length > 0 ? (
+            <div className="results">
+              <h3>Знайдено книги:</h3>
+              {filteredBooks.map((book) => (
+                <div className="bookContainer" key={book.id}>
+                  <p>
+                    <b>Id: </b> {book.id}
+                  </p>
+                  <p>
+                    <b>Назва: </b> {book.name}
+                  </p>
+                  <p>
+                    <b>Автор: </b> {book.author}
+                  </p>
+                  <p>
+                    <b>Категорія: </b> {book.category}
+                  </p>
+                  <p>
+                    <b>Опис: </b> {book.description}
+                  </p>
+                  <p>
+                    <b>Вартість прокату: </b>
+                    {book.price} zł
+                  </p>
+                  {book.url && (
+                    <img
+                      className="bookCoverDelete"
+                      src={book.url}
+                      alt={book.name}
+                    />
+                  )}
+                  <br />
+                  <button
+                    onClick={() => {
+                      navigate(`/edit/${book.id}`);
+                    }}
+                  >
+                    Редагувати
+                  </button>
+                </div>
+              ))}
             </div>
-            <div className="form-field image">
-              <label>Додати обкладинку</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleCoverImageChange}
-              />
-            </div>
-            <div className="form-field images">
-              <label>Додаткові зображення</label>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleAdditionalImagesChange}
-              />
-            </div>
-            <button type="submit">Додати книгу</button>
-          </form>
+          ) : (
+            <h2>Книг не знайдено</h2>
+          )}
         </div>
       ) : (
         <NoAccessMessage />
