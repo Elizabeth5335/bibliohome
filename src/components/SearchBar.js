@@ -1,21 +1,22 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { useBooks } from "../context/BooksContext";
+import { useNavigate } from "react-router-dom";
 
 export default function SearchBar() {
-
   const [searchTerm, setSearchTerm] = React.useState("");
+  const navigate = useNavigate();
 
-
-  const handleSubmit = (e) => {
+  function handleSearch(e) {
     e.preventDefault();
-    window.alert(searchTerm);
-  };
+    navigate(`/books/${searchTerm}`);
+  }
 
   return (
     <section>
       <h2>Шукаєш щось конкретне?</h2>
-      <form onSubmit={handleSubmit} className="search-wrapper">
+      <form onSubmit={handleSearch} className="search-wrapper">
         <input
           type="text"
           placeholder="Введіть назву або автора"

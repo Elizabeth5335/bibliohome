@@ -2,7 +2,7 @@ import React from "react";
 
 export default function BookCard(props) {
   return (
-    <div className="bookCard" style={{margin: "2rem"}}>
+    <div className="bookCard" style={{ margin: "2rem" }}>
       <img
         src={
           props.url ||
@@ -11,9 +11,12 @@ export default function BookCard(props) {
         alt={props.name}
         width={"100px"}
       />
-      <div style={{display: "flex", flexDirection: "column", maxWidth: "150px"}}>
-      <strong>{props.name}</strong>
-      <span>Вартість оренди: {props.price} zł</span>
+      <div
+        style={{ display: "flex", flexDirection: "column", maxWidth: "150px" }}
+      >
+        <strong>{props.name}</strong>
+        {props.author && <strong>Автор: {props.author}</strong>}
+        {props.price && <span>Вартість оренди: {props.price} zł</span>}
       </div>
     </div>
   );

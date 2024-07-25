@@ -26,6 +26,7 @@ export function BooksProvider({ children }) {
       const data = snapshot.val();
       setBooks(data);
     });
+    localStorage.setItem('books', JSON.stringify(books));
   }, []);
 
   React.useEffect(() => {

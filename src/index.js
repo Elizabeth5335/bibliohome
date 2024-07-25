@@ -12,6 +12,7 @@ import Admin from "./components/Admin";
 import AddBook from "./components/AddBook";
 import EditBook from "./components/EditBook";
 import DeleteBook from "./components/DeleteBook";
+import SearchResults from "./components/SearchResults";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,11 @@ const router = createBrowserRouter([
   {
     path: "/books/:age/:category",
     element: <CategorySearchResults />,
+  },
+
+  {
+    path: "/books/:searchTerm",
+    element: <SearchResults />,
   },
   {
     path: "/login",

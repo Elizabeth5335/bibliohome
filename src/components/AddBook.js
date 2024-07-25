@@ -1,8 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getDatabase, ref, push, update, get, child } from "firebase/database";
+import { ref, update } from "firebase/database";
 import {
-  getStorage,
   ref as storageRef,
   uploadBytes,
   getDownloadURL,
@@ -15,18 +14,20 @@ export default function AddBook() {
   const [user, setUser] = React.useState(
     JSON.parse(localStorage.getItem("user")) || null
   );
+
   const [name, setName] = React.useState("");
   const [author, setAuthor] = React.useState("");
   const [id, setId] = React.useState(""); // Generate this automatically if needed
   const [category, setCategory] = React.useState("");
   const [description, setDescription] = React.useState("");
-  // const [url, setUrl] = React.useState("");
+  const [forAdults, setForAdults] = React.useState(false);
   const [additionalImages, setAdditionalImages] = React.useState([]);
   const [price, setPrice] = React.useState("");
   const [coverImage, setCoverImage] = React.useState(null);
-  // const [categories, setCategories] = React.useState(["children/fiction", "children/non-fiction", "adult/fiction", "adult/non-fiction"]);
+  const [loading, setLoading] = React.useState(false);
 
-  const { categories, books, updateBooks } = useBooks();
+  const { categories, books } = useBooks();
+
   const handleCoverImageChange = (e) => {
     setCoverImage(e.target.files[0]);
   };
@@ -34,12 +35,8 @@ export default function AddBook() {
   const [mergedCats, setMergedCats] = React.useState();
 
   React.useEffect(() => {
-    console.log("categories.adults");
-    console.log(categories?.adults);
     if (categories) {
-      // const adultCats = Object.entries(categories?.adults || {});
       const adultCats = categories?.adults;
-      // const childCats = Object.entries(categories?.children || {});
       const childCats = categories?.children;
 
       setMergedCats({ ...adultCats, ...childCats });
@@ -64,6 +61,14 @@ export default function AddBook() {
     );
   };
 
+  const checkIdExists = (bookId) => {
+    return (
+      Object.values(books)?.filter(
+        (book) => book?.id?.toLowerCase() === bookId?.toLowerCase()
+      ).length !== 0
+    );
+  };
+
   function newId(e) {
     const tmp = Object.keys(mergedCats).find(
       (key) => mergedCats[key] === e.target.value
@@ -71,7 +76,7 @@ export default function AddBook() {
     return tmp ? tmp + "-" + Date.now() : Date.now();
   }
 
-  const addBook = (e) => {
+  const addBook = async (e) => {
     e.preventDefault();
     if (checkBookExists(name)) {
       window.alert(
@@ -79,10 +84,17 @@ export default function AddBook() {
       );
       return;
     }
+    if (checkIdExists(id)) {
+      window.alert(
+        "Книга з таким id вже існує. Видаліть її або зверніться до Лізи, щоб виправити помилку."
+      );
+      return;
+    }
+    setLoading(true);
     try {
-      const coverImageUrl = uploadImage(coverImage);
-      const additionalImagesUrls = Promise.all(
-        additionalImages.map((image) => uploadImage(image))
+      const coverImageUrl = await uploadImage(coverImage);
+      const additionalImagesUrls = await Promise.all(
+        additionalImages && additionalImages.map((image) => uploadImage(image))
       );
 
       const newBook = {
@@ -91,14 +103,14 @@ export default function AddBook() {
         author,
         description,
         category,
+        forAdults,
         url: coverImageUrl,
         additionalImages: additionalImagesUrls,
         price,
       };
 
       const booksRef = ref(db, `books/${id}`);
-      update(booksRef, newBook);
-      updateBooks();
+      await update(booksRef, newBook);
 
       window.alert("Книга додана успішно!");
       setId("");
@@ -106,11 +118,19 @@ export default function AddBook() {
       setAuthor("");
       setDescription("");
       setCategory("");
-      setCoverImage("");
-      setAdditionalImages("");
+      setCoverImage(null);
+      setAdditionalImages([]);
       setPrice("");
+      setForAdults(false);
+      setLoading(false);
+      // Reset file input elements
+      document.getElementById("coverImageInput").value = null;
+      document.getElementById("additionalImagesInput").value = null;
     } catch (error) {
-      window.alert("Сталася помилка!", error);
+      console.log("error");
+      console.log(error);
+      setLoading(false);
+      window.alert("Сталася помилка!", error.message);
     }
   };
 
@@ -128,12 +148,7 @@ export default function AddBook() {
           <form onSubmit={addBook}>
             <div className="form-field">
               <label>id</label>
-              <input
-                type="text"
-                value={id}
-                disabled
-                // required
-              />
+              <input type="text" value={id} disabled />
             </div>
             <div className="form-field">
               <label>Назва</label>
@@ -152,25 +167,24 @@ export default function AddBook() {
                 onChange={(e) => setAuthor(e.target.value)}
               />
             </div>
-            <div className="form-field">
-              <label>Опис</label>
-              <textarea
-                type="text"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
+            <div className="form-field price">
+              <label>Книга для дорослих?</label>
+              <div>
+                <input
+                  type="checkbox"
+                  checked={forAdults}
+                  onChange={(e) => setForAdults(e.target.checked)}
+                />
+              </div>
             </div>
+
             <div className="form-field">
               <label>Категорія</label>
               <input
                 type="text"
                 value={category}
                 onChange={(e) => {
-                  console.log("merged");
-                  console.log(mergedCats);
-                  setId(
-                    newId(e)
-                  );
+                  setId(newId(e));
                   return setCategory(e.target.value);
                 }}
                 list="category-options"
@@ -183,13 +197,15 @@ export default function AddBook() {
                       {mergedCats[cat]}
                     </option>
                   ))}
-                {/* {categories &&
-                  Object.entries(categories.children).map(([cat, val]) => (
-                    <option key={cat} value={cat}>
-                      {categories.children[cat]}
-                    </option>
-                  ))} */}
               </datalist>
+            </div>
+            <div className="form-field">
+              <label>Опис</label>
+              <textarea
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
             </div>
             <div className="form-field price">
               <label>Вартість прокату</label>
@@ -202,9 +218,11 @@ export default function AddBook() {
                 <span>zł</span>
               </div>
             </div>
+
             <div className="form-field image">
               <label>Додати обкладинку</label>
               <input
+                id="coverImageInput"
                 type="file"
                 accept="image/*"
                 onChange={handleCoverImageChange}
@@ -213,13 +231,16 @@ export default function AddBook() {
             <div className="form-field images">
               <label>Додаткові зображення</label>
               <input
+                id="additionalImagesInput"
                 type="file"
                 accept="image/*"
                 multiple
                 onChange={handleAdditionalImagesChange}
               />
             </div>
-            <button type="submit">Додати книгу</button>
+            <button type="submit" disabled={loading}>
+              {loading ? "Додається..." : "Додати книгу"}
+            </button>
           </form>
         </div>
       ) : (
