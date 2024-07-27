@@ -1,11 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ref, update } from "firebase/database";
-import {
-  ref as storageRef,
-  uploadBytes,
-  getDownloadURL,
-} from "firebase/storage";
+import { ref, update, get } from "firebase/database";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import NoAccessMessage from "./NoAccessMessage";
 import { useBooks } from "../context/BooksContext";
 import { db, storage } from "../firebaseConfig";
@@ -17,40 +13,61 @@ export default function AddBook() {
 
   const [name, setName] = React.useState("");
   const [author, setAuthor] = React.useState("");
-  const [id, setId] = React.useState(""); // Generate this automatically if needed
+  const [id, setId] = React.useState("");
   const [category, setCategory] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [forAdults, setForAdults] = React.useState(false);
-  const [additionalImages, setAdditionalImages] = React.useState([]);
   const [price, setPrice] = React.useState("");
-  const [coverImage, setCoverImage] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
 
+  const [coverImage, setCoverImage] = React.useState(null);
+  const [coverURL, setCoverURL] = React.useState("");
+  const [additionalImages, setAdditionalImages] = React.useState([]);
+  const [additionalImageURLs, setAdditionalImageURLs] = React.useState([]);
+
   const { categories, books } = useBooks();
-
-  const handleCoverImageChange = (e) => {
-    setCoverImage(e.target.files[0]);
-  };
-
-  const [mergedCats, setMergedCats] = React.useState();
+  const [mergedCats, setMergedCats] = React.useState({});
 
   React.useEffect(() => {
     if (categories) {
       const adultCats = categories?.adults;
       const childCats = categories?.children;
-
       setMergedCats({ ...adultCats, ...childCats });
     }
   }, [categories]);
+
+  const handleCoverImageChange = (e) => {
+    setCoverImage(e.target.files[0]);
+    setCoverURL("");
+  };
 
   const handleAdditionalImagesChange = (e) => {
     setAdditionalImages([...e.target.files]);
   };
 
+  const handleAdditionalImageURLChange = (index, value) => {
+    const newURLs = [...additionalImageURLs];
+    newURLs[index] = value;
+    setAdditionalImageURLs(newURLs);
+  };
+
+  const addAdditionalImageURLField = () => {
+    setAdditionalImageURLs([...additionalImageURLs, ""]);
+  };
+
+  const removeAdditionalImageURLField = (index) => {
+    const newURLs = additionalImageURLs.filter((_, i) => i !== index);
+    setAdditionalImageURLs(newURLs);
+  };
+
   const uploadImage = async (image) => {
-    const imageRef = storageRef(storage, `images/${image?.name}`);
+    const imageRef = storageRef(storage, `images/${image.name}`);
     await uploadBytes(imageRef, image);
     return getDownloadURL(imageRef);
+  };
+
+  const deleteImage = (index) => {
+    setAdditionalImages(additionalImages.filter((_, i) => i !== index));
   };
 
   const checkBookExists = (bookName) => {
@@ -92,9 +109,12 @@ export default function AddBook() {
     }
     setLoading(true);
     try {
-      const coverImageUrl = await uploadImage(coverImage);
+      const coverImageUrl = coverImage
+        ? await uploadImage(coverImage)
+        : coverURL;
+
       const additionalImagesUrls = await Promise.all(
-        additionalImages && additionalImages.map((image) => uploadImage(image))
+        additionalImages.map((image) => uploadImage(image))
       );
 
       const newBook = {
@@ -105,12 +125,28 @@ export default function AddBook() {
         category,
         forAdults,
         url: coverImageUrl,
-        additionalImages: additionalImagesUrls,
+        additionalImages: [...additionalImagesUrls, ...additionalImageURLs],
         price,
+        recentlyAdded: true,
       };
 
       const booksRef = ref(db, `books/${id}`);
       await update(booksRef, newBook);
+
+      // Remove the recently added tag from the oldest book if there are more than 20
+      const allBooks = await get(ref(db, 'books'));
+      const booksArray = Object.values(allBooks.val() || {}).map((book, index) => ({
+        ...book,
+        index,
+      }));
+      const recentlyAddedBooks = booksArray.filter(book => book.recentlyAdded);
+
+      if (recentlyAddedBooks.length > 20) {
+        recentlyAddedBooks.sort((a, b) => a.index - b.index);
+        const oldestBookId = recentlyAddedBooks[0].id;
+        const oldestBookRef = ref(db, `books/${oldestBookId}`);
+        await update(oldestBookRef, { recentlyAdded: false });
+      }
 
       window.alert("Книга додана успішно!");
       setId("");
@@ -123,9 +159,18 @@ export default function AddBook() {
       setPrice("");
       setForAdults(false);
       setLoading(false);
-      // Reset file input elements
-      document.getElementById("coverImageInput").value = null;
-      document.getElementById("additionalImagesInput").value = null;
+      setCoverURL("");
+      setAdditionalImageURLs([]);
+
+      const coverInput = document.getElementById("coverImageInput");
+      const additionalInput = document.getElementById("additionalImagesInput");
+
+      if (coverInput) {
+        coverInput.value = null;
+      }
+      if (additionalInput) {
+        additionalInput.value = null;
+      }
     } catch (error) {
       console.log("error");
       console.log(error);
@@ -136,10 +181,7 @@ export default function AddBook() {
 
   return (
     <div className="add-book">
-      <Link
-        to={"/admin"}
-        style={{ textDecoration: "none", alignSelf: "start" }}
-      >
+      <Link to={"/admin"} style={{ textDecoration: "none", alignSelf: "start" }}>
         <button>Назад</button>
       </Link>
       {user ? (
@@ -220,23 +262,75 @@ export default function AddBook() {
             </div>
 
             <div className="form-field image">
-              <label>Додати обкладинку</label>
+              <label>Обкладинка</label>
               <input
-                id="coverImageInput"
                 type="file"
                 accept="image/*"
                 onChange={handleCoverImageChange}
               />
+              або URL
+              <input
+                type="text"
+                value={coverURL}
+                placeholder="вставте посилання на зображення"
+                onChange={(e) => {
+                  setCoverImage(null);
+                  setCoverURL(e.target.value);
+                }}
+              />
+              {coverImage && (
+                <img
+                  className="bookCoverDelete"
+                  src={URL.createObjectURL(coverImage)}
+                  alt={name}
+                />
+              )}
+              {!coverImage && coverURL && (
+                <img className="bookCoverDelete" src={coverURL} alt={name} />
+              )}
             </div>
+
             <div className="form-field images">
               <label>Додаткові зображення</label>
               <input
-                id="additionalImagesInput"
                 type="file"
                 accept="image/*"
                 multiple
                 onChange={handleAdditionalImagesChange}
               />
+              {additionalImages.map((image, index) => (
+                <div key={`new-img${index}`} className="image-wrapper">
+                  <img
+                    className="bookCoverDelete"
+                    src={URL.createObjectURL(image)}
+                    alt={`new-img${index}`}
+                  />
+                  <button type="button" onClick={() => deleteImage(index)}>
+                    Видалити
+                  </button>
+                </div>
+              ))}
+              {additionalImageURLs.map((url, index) => (
+                <div key={`new-url${index}`} className="image-wrapper">
+                  <input
+                    type="text"
+                    value={url}
+                    onChange={(e) =>
+                      handleAdditionalImageURLChange(index, e.target.value)
+                    }
+                    placeholder="вставте посилання на зображення"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeAdditionalImageURLField(index)}
+                  >
+                    Видалити
+                  </button>
+                </div>
+              ))}
+              <button type="button" onClick={addAdditionalImageURLField}>
+                Додати посилання на зображення
+              </button>
             </div>
             <button type="submit" disabled={loading}>
               {loading ? "Додається..." : "Додати книгу"}

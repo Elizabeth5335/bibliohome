@@ -10,18 +10,22 @@ export default function EditBook() {
   const [name, setName] = React.useState("");
   const [id, setId] = React.useState("");
 
-  const [filteredBooks, setFilteredBooks] = React.useState();
-
   const { books } = useBooks();
+
+  const [filteredBooks, setFilteredBooks] = React.useState();
 
   function findBook() {
     if (books) {
       const bookList = Object.values(books) || [];
 
       if (id) {
-        return bookList.filter((book) => book.id?.toLowerCase().includes(id?.toLowerCase()));
+        return bookList.filter((book) =>
+          book.id?.toLowerCase().includes(id?.toLowerCase())
+        );
       } else if (name) {
-        return bookList.filter((book) => book.name?.toLowerCase().includes(name?.toLowerCase()));
+        return bookList.filter((book) =>
+          book.name?.toLowerCase().includes(name?.toLowerCase())
+        );
       } else {
         return null;
       }
@@ -29,8 +33,12 @@ export default function EditBook() {
   }
 
   React.useEffect(() => {
-    setFilteredBooks(findBook);
+    setFilteredBooks(findBook());
   }, [id, name]);
+
+  React.useEffect(() => {
+    if(books) setFilteredBooks(Object.values(books));
+  }, [books]);
 
   const navigate = useNavigate();
 

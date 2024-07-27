@@ -244,6 +244,7 @@ textarea {
 .bookCoverDelete {
   max-height: 150px;
   max-width: 300px;
+  object-fit: contain;
 }
 
 .delete,
