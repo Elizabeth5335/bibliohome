@@ -21,9 +21,9 @@ export default function DeleteBook() {
       const bookList = Object.values(books) || [];
 
       if (bookId) {
-        return bookList.filter((book) => book.id.includes(bookId));
+        return bookList.filter((book) => book.id?.toLowerCase().includes(bookId.toLowerCase()));
       } else if (name) {
-        return bookList.filter((book) => book.name.includes(name));
+        return bookList.filter((book) => book.name?.toLowerCase().includes(name.toLowerCase()));
       } else {
         return null;
       }
