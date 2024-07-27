@@ -344,6 +344,7 @@ textarea {
 
   img {
     max-width: 150px;
+    height: 200px;
   }
   .text {
     display: flex;
@@ -351,6 +352,10 @@ textarea {
     max-width: 150px;
     text-align: start;
   }
+}
+
+.random-book{
+  text-align: center;
 }
 
 .bookPage {
