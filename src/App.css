@@ -278,8 +278,8 @@ textarea {
 }
 
 
-a button{
-  color: #000;
+button{
+  color: #000 !important;
 }
 /* --------- MOBILE----------- */
 
