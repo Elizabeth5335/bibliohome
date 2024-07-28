@@ -15,6 +15,7 @@ import EditBook from "./components/EditBook";
 import DeleteBook from "./components/DeleteBook";
 import SearchResults from "./components/SearchResults";
 import EditBookById from "./components/EditBookById";
+import NewBooks from "./components/NewBooks";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
   {
     path: "/books/:searchTerm",
     element: <SearchResults />,
+  },
+  {
+    path: "/books/new",
+    element: <NewBooks />,
   },
   {
     path: "/edit/:bookId",

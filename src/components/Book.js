@@ -2,10 +2,23 @@ import React from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useBooks } from "../context/BooksContext";
 
+function ImageModal({ src, alt, onClose }) {
+  return (
+    <div className="modal" onClick={onClose}>
+      <div className="modal-content">
+        <span className="close" onClick={onClose}>&times;</span>
+        <img src={src} alt={alt} className="modal-image" />
+      </div>
+    </div>
+  );
+}
+
 export default function Book() {
   const { bookId } = useParams();
   const { books } = useBooks();
   const [book, setBook] = React.useState();
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [selectedImage, setSelectedImage] = React.useState("");
 
   const navigate = useNavigate();
 
@@ -16,13 +29,23 @@ export default function Book() {
     }
   }, [bookId, books]);
 
+  const handleImageClick = (imageSrc) => {
+    setSelectedImage(imageSrc ||
+      "https://timvandevall.com/wp-content/uploads/2014/01/Book-Cover-Template.jpg");
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage("");
+  };
+
   if (!book) {
     return <div>Loading...</div>;
   }
 
   return (
     <div className="outContainer">
-      {/* <Link to={"/"} style={{ textDecoration: "none" }}> */}
       <button
         onClick={() => {
           navigate(-1);
@@ -30,7 +53,6 @@ export default function Book() {
       >
         Назад
       </button>
-      {/* </Link> */}
       <div className="bookPage">
         <div>
           <img
@@ -40,6 +62,7 @@ export default function Book() {
               "https://timvandevall.com/wp-content/uploads/2014/01/Book-Cover-Template.jpg"
             }
             alt={book.name}
+            onClick={() => handleImageClick(book.url)}
           />
         </div>
         <div>
@@ -61,18 +84,23 @@ export default function Book() {
           </p>
           {book?.additionalImages && (
             <div>
-              <b>More images</b>
+              <b>Додаткові зображення</b>
               {book.additionalImages.map((image, index) => (
                 <img
+                  key={index}
                   className="additional-image"
                   src={image}
                   alt={`${book.name}-${index}`}
+                  onClick={() => handleImageClick(image)}
                 />
               ))}
             </div>
           )}
         </div>
       </div>
+      {isModalOpen && (
+        <ImageModal src={selectedImage} alt="Book Image" onClose={handleCloseModal} />
+      )}
     </div>
   );
 }

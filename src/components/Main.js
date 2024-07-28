@@ -3,6 +3,8 @@ import CategoryList from "./CategoryList";
 import SearchBar from "./SearchBar";
 import RandomBook from "./RandomBook";
 import BiblioHome from "../assets/BiblioHome.png"
+import NewBooks from "./NewBooks";
+import { Link } from "react-router-dom";
 
 export default function Main() {
   return (
@@ -13,6 +15,9 @@ export default function Main() {
       <SearchBar></SearchBar>
       {/* <h2>або</h2> */}
       <CategoryList></CategoryList>
+      <section>
+        <Link to="books/new"><h2>Недавно додані</h2></Link>
+      </section>
       {/* <h2>або</h2> */}
       <RandomBook></RandomBook>
     </div>
