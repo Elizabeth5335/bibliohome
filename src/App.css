@@ -450,3 +450,10 @@ textarea {
   max-width: 200px;
   max-height: 300px;
 }
+
+
+.recently-text{
+  color: #000;
+  text-decoration: underline;
+}
+
