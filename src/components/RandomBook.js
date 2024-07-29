@@ -31,7 +31,7 @@ export default function RandomBook() {
         <div className="random-book">
           <h3>{randomBook.name}</h3>
           <p><b>Автор:</b> {randomBook.author}</p>
-          <p><b>Категорія:</b> {randomBook.category}</p>
+          <p><b>Категорія:</b> {Array.isArray(randomBook.category) ? randomBook.category.join('; ') : randomBook.category}</p>
           <p><b>Вартість прокату:</b> {randomBook.price} zł</p>
           {randomBook.url && (
             <img

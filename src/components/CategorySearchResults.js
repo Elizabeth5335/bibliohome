@@ -13,7 +13,14 @@ export default function CategorySearchResults(props) {
   React.useEffect(() => {
     if (books) {
       const filtered = Object.values(books).filter(
-        (book) => book.category === categories[age][category]
+        (book) => {
+          if (Array.isArray(book?.category)) {
+            return book?.category?.map((cat) =>
+              categories[age][category]?.toLowerCase().includes(cat?.toLowerCase())
+            );
+          }
+          else return categories[age][category]?.toLowerCase()?.includes(book?.category?.toLowerCase())
+        }
       );
       setFilteredBooks(filtered);
     }

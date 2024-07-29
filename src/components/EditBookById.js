@@ -29,7 +29,16 @@ export default function EditBookById() {
   const [name, setName] = React.useState(book?.name || "");
   const [id, setId] = React.useState(book?.id);
   const [author, setAuthor] = React.useState(book?.author || "");
-  const [category, setCategory] = React.useState(book?.category || "");
+  const [category, setCategory] = React.useState(
+    Array.isArray(book?.category)
+      ? book?.category[0]
+      : book?.category
+      ? book?.category
+      : ""
+  );
+  const [additionalCategories, setAdditionalCategories] = React.useState(
+    Array.isArray(book?.category) ? book?.category.slice(1) : ""
+  );
   const [description, setDescription] = React.useState(book?.description || "");
 
   const [price, setPrice] = React.useState(book?.price || "");
@@ -117,7 +126,7 @@ export default function EditBookById() {
         name,
         author,
         description,
-        category,
+        category: [category, ...additionalCategories],
         forAdults: book.forAdults,
         url: coverImageUrl,
         additionalImages: [
@@ -138,7 +147,7 @@ export default function EditBookById() {
 
       window.alert("Зміни збережені!");
       setLoading(false);
-      navigate('/edit');
+      navigate("/edit");
     } catch (error) {
       console.log("error", error);
       setLoading(false);
@@ -203,6 +212,20 @@ export default function EditBookById() {
                     </option>
                   ))}
               </datalist>
+            </div>
+
+            <div className="form-field">
+              <label>Додаткові категорії</label>
+              <input
+                type="text"
+                value={additionalCategories}
+                onChange={(e) => {
+                  const categories = e.target.value
+                    .split(",")
+                  setAdditionalCategories(categories);
+                }}
+                placeholder="введіть додаткові категорії через кому"
+              />
             </div>
             <div className="form-field price">
               <label>Вартість прокату</label>

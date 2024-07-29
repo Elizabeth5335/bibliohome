@@ -15,6 +15,7 @@ export default function AddBook() {
   const [author, setAuthor] = React.useState("");
   const [id, setId] = React.useState("");
   const [category, setCategory] = React.useState("");
+  const [additionalCategories, setAdditionalCategories] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [forAdults, setForAdults] = React.useState(false);
   const [price, setPrice] = React.useState("");
@@ -122,7 +123,7 @@ export default function AddBook() {
         name,
         author,
         description,
-        category,
+        category: [category, ...additionalCategories],
         forAdults,
         url: coverImageUrl,
         additionalImages: [...additionalImagesUrls, ...additionalImageURLs],
@@ -241,6 +242,20 @@ export default function AddBook() {
                   ))}
               </datalist>
             </div>
+
+            <div className="form-field">
+              <label>Додаткові категорії</label>
+              <input
+                type="text"
+                onChange={(e) => {
+                  const categories = e.target.value.split(',').map(cat => cat.trim());
+                  setAdditionalCategories(categories);
+                }}
+                placeholder="введіть додаткові категорії через кому"
+              />
+            </div>
+
+
             <div className="form-field">
               <label>Опис</label>
               <textarea

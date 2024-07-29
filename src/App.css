@@ -330,6 +330,7 @@ button {
 
     img {
       max-width: 100%;
+      object-fit: contain;
     }
 
     .results {
@@ -348,6 +349,7 @@ button {
 
     img {
       width: min(300px, 80vw);
+      object-fit: contain;
     }
   }
 }
@@ -381,6 +383,7 @@ button {
   img {
     max-width: 150px;
     height: 200px;
+    object-fit: contain;
   }
   .text {
     display: flex;

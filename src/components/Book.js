@@ -80,7 +80,7 @@ export default function Book() {
             </p>
           )}
           <p>
-            <b>Категорія:</b> {book.category}
+          <b>Категорія:</b> {Array.isArray(book.category) ? book.category.join('; ') : book.category}
           </p>
           {book?.additionalImages && (
             <div>

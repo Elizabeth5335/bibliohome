@@ -72,7 +72,6 @@ export default function EditBook() {
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
-              <button type="submit">Знайти книгу</button>
             </form>
           </div>
           {filteredBooks?.length > 0 ? (
@@ -90,7 +89,7 @@ export default function EditBook() {
                     <b>Автор: </b> {book.author}
                   </p>
                   <p>
-                    <b>Категорія: </b> {book.category}
+                    <b>Категорія: </b> {Array.isArray(book.category) ? book.category.join('; ') : book.category}
                   </p>
                   <p>
                     <b>Опис: </b> {book.description}
