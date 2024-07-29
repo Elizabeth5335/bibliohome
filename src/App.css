@@ -109,6 +109,10 @@ h2 {
   padding: 0;
   text-align: center;
   justify-items: center;
+
+  button{
+    color: #fff !important;
+  }
 }
 
 .search-results section {
