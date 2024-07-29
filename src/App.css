@@ -28,7 +28,7 @@ button {
   margin: 0.5rem;
   border-radius: 16px;
   appearance: none;
-  color: #000;
+  color: #000 !important;
   box-shadow: 2px 2px 5px #d6ccc2;
 }
 
@@ -279,18 +279,28 @@ textarea {
   padding: 3rem;
 }
 
-
-button{
+button {
   color: #000 !important;
 }
 /* --------- MOBILE----------- */
 
 @media screen and (max-width: 756px) {
-  form{
+  .bookList {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr;
+
+    .bookCard {
+      width: auto;
+      margin: 1rem 0;
+    }
+  }
+
+  form {
     max-width: 100vw;
   }
 
-  input, textarea{
+  input,
+  textarea {
     width: 100%;
     box-sizing: border-box;
   }
@@ -324,8 +334,6 @@ button{
     .bookContainer {
       width: auto;
     }
-
-    
   }
 
   .bookCard {
@@ -337,6 +345,13 @@ button{
     img {
       width: min(300px, 80vw);
     }
+  }
+}
+
+@media screen and (min-width: 411px) {
+  .bookList {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
 }
 
@@ -371,7 +386,7 @@ button{
   }
 }
 
-.random-book{
+.random-book {
   text-align: center;
 }
 
@@ -396,25 +411,22 @@ button{
 
 .bookList {
   max-width: 900px;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   margin: auto;
   justify-content: center;
 }
 
-
-.outContainer{
+.outContainer {
   max-width: 900px;
   margin: auto;
 }
 
-.additional-image{
+.additional-image {
   max-width: min(700px, 90vw);
   display: block;
   margin: 1rem;
 }
-
-
 
 .modal {
   display: flex;
@@ -427,7 +439,7 @@ button{
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modal-content {
@@ -462,15 +474,14 @@ button{
   max-width: 100%;
 }
 
-.bookCoverMain, .additional-image {
+.bookCoverMain,
+.additional-image {
   cursor: pointer;
   max-width: 200px;
   max-height: 300px;
 }
 
-
-.recently-text{
+.recently-text {
   color: #000;
   text-decoration: underline;
 }
-
