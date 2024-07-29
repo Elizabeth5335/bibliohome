@@ -3,28 +3,30 @@ import BookList from "./BookList";
 import { Link, useParams } from "react-router-dom";
 import { useBooks } from "../context/BooksContext";
 
-export default function CategorySearchResults(props) {
-  const [filteredBooks, setFilteredBooks] = React.useState();
+export default function CategorySearchResults() {
+  const [filteredBooks, setFilteredBooks] = React.useState([]);
   const { age, category } = useParams();
   const { books, categories } = useBooks();
 
-  console.log(categories);
-
   React.useEffect(() => {
-    if (books) {
-      const filtered = Object.values(books).filter(
-        (book) => {
+    if (books && categories) {
+      const selectedCategory = categories[age]?.[category]?.toLowerCase();
+      if (selectedCategory) {
+        const filtered = Object.values(books).filter((book) => {
           if (Array.isArray(book?.category)) {
-            return book?.category?.map((cat) =>
-              categories[age][category]?.toLowerCase().includes(cat?.toLowerCase())
+            return book?.category.some((cat) =>
+              selectedCategory.includes(cat.toLowerCase())
             );
+          } else {
+            return selectedCategory.includes(book?.category?.toLowerCase());
           }
-          else return categories[age][category]?.toLowerCase()?.includes(book?.category?.toLowerCase())
-        }
-      );
-      setFilteredBooks(filtered);
+        });
+        setFilteredBooks(filtered);
+      } else {
+        setFilteredBooks([]);
+      }
     }
-  }, []);
+  }, [books, categories, age, category]);
 
   return (
     <div className="search-results outContainer">
@@ -36,8 +38,8 @@ export default function CategorySearchResults(props) {
         <h2>Книги категорії "{categories[age][category]}"</h2>
       )}
 
-      {filteredBooks?.length > 0 ? (
-        <BookList books={filteredBooks}></BookList>
+      {filteredBooks.length > 0 ? (
+        <BookList books={filteredBooks} />
       ) : (
         "Немає книг заданої категорії"
       )}

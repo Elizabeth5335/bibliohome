@@ -17,7 +17,7 @@ export default function NewBooks() {
       );
       setFilteredBooks(filtered);
     }
-  }, []);
+  }, [books]);
 
   return (
     <div className="outContainer">

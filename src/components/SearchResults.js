@@ -5,8 +5,8 @@ import { useBooks } from "../context/BooksContext";
 import SearchBar from "./SearchBar";
 
 export default function SearchResults(props) {
-  const [filteredBooks, setFilteredBooks] = React.useState();
-  const [exactFilteredBooks, setExactFilteredBooks] = React.useState();
+  const [filteredBooks, setFilteredBooks] = React.useState([]);
+  const [exactFilteredBooks, setExactFilteredBooks] = React.useState([]);
   const { searchTerm } = useParams();
   const { books } = useBooks();
 
@@ -24,8 +24,7 @@ export default function SearchResults(props) {
         return book.name?.toLowerCase().includes(searchLower);
       });
 
-      let nameFiltered = [];
-      nameFiltered = Object.values(books).filter((book) => {
+      const nameFiltered = Object.values(books).filter((book) => {
         const nameParts = book.name?.toLowerCase().split(" ");
         let flag = false;
         nameParts?.map((part) => {
@@ -64,7 +63,7 @@ export default function SearchResults(props) {
       setFilteredBooks(uniqueBooks);
       setExactFilteredBooks(uniqueExact);
     }
-  }, [searchTerm]);
+  }, [searchTerm, books]);
 
   const levenshtein = (s, t) => {
     if (!s.length || (!s && t)) return t.length;
