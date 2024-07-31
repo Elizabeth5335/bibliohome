@@ -65,8 +65,13 @@ h2 {
   margin: auto;
   border-bottom: 1px solid #7b6152;
   display: flex;
-  gap: 3rem;
+  flex-wrap: wrap;
+  
   justify-content: center;
+}
+
+.tabs button{
+  margin: 1rem 2rem;
 }
 
 .tabs button {
@@ -311,6 +316,10 @@ button {
     grid-template-columns: 1fr 1fr 1fr;
 
     
+  }
+
+  .tabs button{
+    margin: 1rem 2rem;
   }
 
   .bookList .bookCard {
