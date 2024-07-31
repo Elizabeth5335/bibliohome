@@ -10,15 +10,18 @@ export default function CategorySearchResults() {
 
   React.useEffect(() => {
     if (books && categories) {
-      const selectedCategory = categories[age]?.[category]?.toLowerCase();
+      const selectedCategory = categories[age]?.find(
+        (cat) => cat.catId.toLowerCase() === category.toLowerCase()
+      )?.name.toLowerCase();
+
       if (selectedCategory) {
         const filtered = Object.values(books).filter((book) => {
-          if (Array.isArray(book?.category)) {
-            return book?.category.some((cat) =>
+          if (Array.isArray(book.category)) {
+            return book.category.some((cat) =>
               selectedCategory.includes(cat.toLowerCase())
             );
           } else {
-            return selectedCategory.includes(book?.category?.toLowerCase());
+            return selectedCategory.includes(book.category?.toLowerCase());
           }
         });
         setFilteredBooks(filtered);
@@ -30,12 +33,12 @@ export default function CategorySearchResults() {
 
   return (
     <div className="search-results outContainer">
-      <Link to={"/"} style={{ textDecoration: "none" }}>
+      <Link to="/" style={{ textDecoration: "none" }}>
         <button>На головну</button>
       </Link>
 
       {categories && categories[age] && (
-        <h2>Книги категорії "{categories[age][category]}"</h2>
+        <h2>Книги категорії "{categories[age].find((cat) => cat.catId.toLowerCase() === category.toLowerCase())?.name}"</h2>
       )}
 
       {filteredBooks.length > 0 ? (
