@@ -15,48 +15,59 @@ export default function EditBookById() {
   const { categories, books } = useBooks();
   const { bookId } = useParams();
   const navigate = useNavigate();
-
   const [user, setUser] = React.useState(
     JSON.parse(localStorage.getItem("user")) || null
   );
-
-  const findBook = () => {
-    if (books) return Object.values(books).find((book) => book.id === bookId);
-  };
-
-  const [book, setBook] = React.useState(findBook());
-
-  const [name, setName] = React.useState(book?.name || "");
-  const [id, setId] = React.useState(book?.id);
-  const [author, setAuthor] = React.useState(book?.author || "");
-  const [category, setCategory] = React.useState(
-    Array.isArray(book?.category)
-      ? book?.category[0]
-      : book?.category
-      ? book?.category
-      : ""
-  );
-  const [additionalCategories, setAdditionalCategories] = React.useState(
-    Array.isArray(book?.category) ? book?.category.slice(1) : ""
-  );
-  const [description, setDescription] = React.useState(book?.description || "");
-
-  const [price, setPrice] = React.useState(book?.price || "");
+  const [book, setBook] = React.useState(null);
+  const [name, setName] = React.useState("");
+  const [id, setId] = React.useState("");
+  const [author, setAuthor] = React.useState("");
+  const [category, setCategory] = React.useState("");
+  const [additionalCategories, setAdditionalCategories] = React.useState([]);
+  const [description, setDescription] = React.useState("");
+  const [price, setPrice] = React.useState("");
   const [coverImage, setCoverImage] = React.useState(null);
-  const [coverURL, setCoverURL] = React.useState(book?.url || "");
+  const [coverURL, setCoverURL] = React.useState("");
   const [additionalImages, setAdditionalImages] = React.useState([]);
   const [additionalImageURLs, setAdditionalImageURLs] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
-
-  const [mergedCats, setMergedCats] = React.useState();
+  const [mergedCats, setMergedCats] = React.useState([]);
 
   React.useEffect(() => {
     if (categories) {
-      const adultCats = categories?.adults;
-      const childCats = categories?.children;
-      setMergedCats({ ...adultCats, ...childCats });
+      const merged = [
+        ...categories.adults.map(cat => ({ catId: cat.catId, name: cat.name })),
+        ...categories.children.map(cat => ({ catId: cat.catId, name: cat.name })),
+      ];
+            
+      setMergedCats(merged);
+      console.log("merged");
+      console.log(merged);
     }
   }, [categories]);
+
+  React.useEffect(() => {
+    if (books && bookId) {
+      const bookToEdit = books[bookId];
+      if (bookToEdit) {
+        setBook(bookToEdit);
+        setName(bookToEdit?.name);
+        setId(bookToEdit?.id);
+        setAuthor(bookToEdit?.author);
+        setCategory(
+          Array.isArray(bookToEdit?.category)
+            ? bookToEdit.category[0]
+            : bookToEdit.category
+        );
+        setAdditionalCategories(
+          Array.isArray(bookToEdit?.category) ? bookToEdit?.category.slice(1) : []
+        );
+        setDescription(bookToEdit?.description);
+        setPrice(bookToEdit?.price);
+        setCoverURL(bookToEdit?.url);
+      }
+    }
+  }, [books, bookId]);
 
   const handleCoverImageChange = (e) => {
     setCoverImage(e.target.files[0]);
@@ -83,25 +94,28 @@ export default function EditBookById() {
   };
 
   const uploadImage = async (image) => {
-    const imageRef = storageRef(storage, `images/${image?.name}`);
+    const imageRef = storageRef(storage, `images/${image.name}`);
     await uploadBytes(imageRef, image);
     return getDownloadURL(imageRef);
   };
 
-  const newId = (e) => {
-    const tmp = Object.keys(mergedCats).find(
-      (key) => mergedCats[key] === e.target.value
-    );
-    return tmp ? tmp + "-" + Date.now() : Date.now();
+  const newId = (categoryName) => {
+    const timestamp = Date.now().toString().slice(-6);
+    
+    const foundCat = mergedCats.find(cat => cat.name === categoryName);
+    
+    return foundCat ? `${foundCat.catId}-${timestamp}`.slice(0, 9) : timestamp;
   };
+  
+  
+  
 
   const deleteImage = (index) => {
     setAdditionalImages(additionalImages.filter((_, i) => i !== index));
   };
 
   const deleteExistingImage = (index) => {
-    const updatedImages = [...(book.additionalImages || [])];
-    updatedImages.splice(index, 1);
+    const updatedImages = book.additionalImages.filter((_, i) => i !== index);
     setBook({ ...book, additionalImages: updatedImages });
   };
 
@@ -113,8 +127,6 @@ export default function EditBookById() {
 
       if (coverImage) {
         coverImageUrl = await uploadImage(coverImage);
-      } else if (!coverURL) {
-        coverImageUrl = book.url;
       }
 
       const additionalImagesUrls = await Promise.all(
@@ -149,7 +161,7 @@ export default function EditBookById() {
       setLoading(false);
       navigate("/edit");
     } catch (error) {
-      console.log("error", error);
+      console.error("error", error);
       setLoading(false);
       window.alert("Сталася помилка!", error.message);
     }
@@ -198,19 +210,18 @@ export default function EditBookById() {
                 type="text"
                 value={category}
                 onChange={(e) => {
-                  setId(newId(e));
+                  setId(newId(e.target.value));
                   setCategory(e.target.value);
                 }}
                 list="category-options"
                 required
               />
               <datalist id="category-options">
-                {mergedCats &&
-                  Object.entries(mergedCats).map(([cat, val]) => (
-                    <option key={cat} value={val}>
-                      {mergedCats[cat]}
-                    </option>
-                  ))}
+                {mergedCats.map((cat) => (
+                  <option key={cat.catId} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
               </datalist>
             </div>
 
@@ -218,12 +229,12 @@ export default function EditBookById() {
               <label>Додаткові категорії</label>
               <input
                 type="text"
-                value={additionalCategories}
-                onChange={(e) => {
-                  const categories = e.target.value
-                    .split(",")
-                  setAdditionalCategories(categories);
-                }}
+                value={additionalCategories.join(", ")}
+                onChange={(e) =>
+                  setAdditionalCategories(
+                    e.target.value.split(",").map((cat) => cat.trim())
+                  )
+                }
                 placeholder="введіть додаткові категорії через кому"
               />
             </div>
@@ -275,7 +286,7 @@ export default function EditBookById() {
                 multiple
                 onChange={handleAdditionalImagesChange}
               />
-              {additionalImages?.map((image, index) => (
+              {additionalImages.map((image, index) => (
                 <div key={`new-img${index}`} className="image-wrapper">
                   <img
                     className="bookCoverDelete"

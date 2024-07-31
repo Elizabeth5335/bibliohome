@@ -32,10 +32,6 @@ export default function SearchBar() {
         </button>
       </form>
 
-      {/* <input onBlur={(e)=>alert(e.target.value)}type="text" placeholder="Введіть назву або автора"></input> */}
-      {/* search with tolerance
-      https://tomekdev.com/posts/search-with-typo-tolerance
-      */}
     </section>
   );
 }

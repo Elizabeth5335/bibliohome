@@ -27,13 +27,15 @@ export default function AddBook() {
   const [additionalImageURLs, setAdditionalImageURLs] = React.useState([]);
 
   const { categories, books } = useBooks();
-  const [mergedCats, setMergedCats] = React.useState({});
+  const [mergedCats, setMergedCats] = React.useState([]);
 
   React.useEffect(() => {
     if (categories) {
-      const adultCats = categories?.adults;
-      const childCats = categories?.children;
-      setMergedCats({ ...adultCats, ...childCats });
+        const merged = [
+          ...categories.adults.map(cat => ({ catId: cat.catId, name: cat.name })),
+          ...categories.children.map(cat => ({ catId: cat.catId, name: cat.name })),
+        ];   
+        setMergedCats(merged);
     }
   }, [categories]);
 
@@ -88,10 +90,9 @@ export default function AddBook() {
   };
 
   function newId(e) {
-    const tmp = Object.keys(mergedCats).find(
-      (key) => mergedCats[key] === e.target.value
-    );
-    return tmp ? tmp + "-" + Date.now() : Date.now();
+    const timestamp = Date.now().toString().slice(-6);
+    const foundCat = mergedCats.find(cat => cat.name === e.target.value);
+    return foundCat ? `${foundCat.catId}-${timestamp}`.slice(0, 9) : timestamp;
   }
 
   const addBook = async (e) => {
@@ -234,12 +235,11 @@ export default function AddBook() {
                 required
               />
               <datalist id="category-options">
-                {mergedCats &&
-                  Object.entries(mergedCats).map(([cat, val]) => (
-                    <option key={cat} value={val}>
-                      {mergedCats[cat]}
-                    </option>
-                  ))}
+                {mergedCats.map((cat) => (
+                  <option key={cat.catId} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
               </datalist>
             </div>
 

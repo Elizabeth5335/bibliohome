@@ -5,10 +5,9 @@ import { useBooks } from "../context/BooksContext";
 
 export default function NewBooks() {
   const [filteredBooks, setFilteredBooks] = React.useState();
-  const { age, category } = useParams();
-  const { books, categories } = useBooks();
+  const { books } = useBooks();
 
-  console.log(categories);
+
 
   React.useEffect(() => {
     if (books) {
