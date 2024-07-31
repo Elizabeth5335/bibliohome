@@ -16,14 +16,17 @@ export default function CategoryList(props) {
   };
 
   const renderCategories = (categories) => {
-    return categories.map((category) => (
-      <li key={category.catId}>
-        <Link to={`/books/${activeTab}/${category.catId}`}>
-          <button>{category.name}</button>
-        </Link>
-      </li>
-    ));
+    return categories
+      ?.filter(category => category.catId !== 'X')
+      .map(category => (
+        <li key={category.catId}>
+          <Link to={`/books/${activeTab}/${category.catId}`}>
+            <button>{category.name}</button>
+          </Link>
+        </li>
+      ));
   };
+  
 
   return (
     <section>
@@ -34,14 +37,17 @@ export default function CategoryList(props) {
             className={activeTab === "adults" ? "active" : ""}
             onClick={() => handleTabChange("adults")}
           >
-            Дорослі
+            КНИГИ ДЛЯ ДОРОСЛИХ
           </button>
           <button
             className={activeTab === "children" ? "active" : ""}
             onClick={() => handleTabChange("children")}
           >
-            Діти
+            КНИГИ ДЛЯ ДІТЕЙ
           </button>
+          <Link to={`/books/adults/X`}>
+          <button>БОНУСНІ КНИГИ</button>
+        </Link>
         </div>
         {categories&&<div className="content">
           <ul>{renderCategories(categories[activeTab])}</ul>

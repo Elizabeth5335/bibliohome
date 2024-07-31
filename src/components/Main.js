@@ -16,7 +16,7 @@ export default function Main() {
       {/* <h2>або</h2> */}
       <CategoryList></CategoryList>
       <section>
-        <Link to="books/new"><h2 className="recently-text">Недавно додані</h2></Link>
+        <Link to="books/new"><h2 className="recently-text">НОВИНКИ</h2></Link>
       </section>
       {/* <h2>або</h2> */}
       <RandomBook></RandomBook>
