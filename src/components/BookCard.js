@@ -11,7 +11,7 @@ export default function BookCard(props) {
           "https://timvandevall.com/wp-content/uploads/2014/01/Book-Cover-Template.jpg"
         }
         alt={props.name}
-        
+        loading="lazy"
       />
       <div
         className="text"

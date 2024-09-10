@@ -67,15 +67,15 @@ export default function Book() {
         </div>
         <div>
           <h2>{book.name}</h2>
-          <p>
-            <b>Вартість прокату:</b> {book.price} zł
+          <p className="importantText">
+            <b>Вартість прокату: {book.price} zł</b>
           </p>
-          <p>
+          <p className="importantText">
             <b>Автор:</b> {book.author}
           </p>
           {book.description && (
             <p>
-              <b>Опис:</b>
+              <b>Опис: </b>
               {book.description}
             </p>
           )}
