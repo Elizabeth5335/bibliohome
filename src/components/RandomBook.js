@@ -25,7 +25,7 @@ export default function RandomBook() {
       <h2>Перевір свою удачу!</h2>
       <p>Випадкова книга</p>
       <button onClick={() => generateRND(true)}>Згенерувати дорослому</button>
-      <button onClick={() => generateRND()}>Згенерувати дитині</button>
+      <button onClick={() => generateRND(false)}>Згенерувати дитині</button>
       {randomBook && (
 
         <div className="random-book">

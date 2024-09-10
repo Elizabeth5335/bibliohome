@@ -31,11 +31,11 @@ export default function BookList(props) {
         )}
       </div>
 
-      <ResponsivePagination
+      {totalPages>1 && <ResponsivePagination
         current={currentPage}
         total={totalPages}
         onPageChange={setCurrentPage}
-      />
+      />}
     </div>
   );
 }

@@ -10,65 +10,18 @@ export default function SearchResults(props) {
   const { searchTerm } = useParams();
   const { books } = useBooks();
 
-  //   if (!books) {
-  //     books = JSON.parse(localStorage.getItem("books"));
-  //   }
-
   const MIN_DISTANCE = 3;
 
-  React.useEffect(() => {
-    if (books) {
-      const searchLower = searchTerm?.toLowerCase();
+  const normalizeString = (str) => {
+    if (!str) return "";
+    return str.toLowerCase().replace(/[^a-zа-яієґ0-9\s]/gi, "").trim();
+  };
 
-      let nameFilteredExact = Object.values(books).filter((book) => {
-        return book.name?.toLowerCase().includes(searchLower);
-      });
-
-      const nameFiltered = Object.values(books).filter((book) => {
-        const nameParts = book.name?.toLowerCase().split(" ");
-        let flag = false;
-        nameParts?.map((part) => {
-          const distance = levenshtein(part, searchLower);
-          if (distance <= MIN_DISTANCE && !book.name?.toLowerCase().includes(searchLower)) flag = true;
-        });
-        return flag;
-      });
-
-      let authorFilteredExact = Object.values(books).filter((book) => {
-        return book.author?.toLowerCase().includes(searchLower);
-      });
-
-      let authorFiltered = [];
-      authorFiltered = Object.values(books).filter((book) => {
-        let flag = false;
-
-        const splitAuthor = book.author?.toLowerCase().split(" ");
-        splitAuthor?.map((name) => {
-          const distance = levenshtein(name, searchLower);
-          if (distance <= MIN_DISTANCE && !book.author?.toLowerCase().includes(searchLower)) flag = true;
-        });
-        return flag;
-      });
-
-      const combinedFilter = [...nameFiltered, ...authorFiltered];
-      const uniqueBooks = Array.from(
-        new Set(combinedFilter.map((book) => book.id))
-      ).map((id) => combinedFilter.find((book) => book.id === id));
-
-      const combinedExact = [...nameFilteredExact, ...authorFilteredExact];
-      const uniqueExact = Array.from(
-        new Set(combinedExact.map((book) => book.id))
-      ).map((id) => combinedExact.find((book) => book.id === id));
-
-      setFilteredBooks(uniqueBooks);
-      setExactFilteredBooks(uniqueExact);
-    }
-  }, [searchTerm, books]);
+  const splitIntoWords = (str) => normalizeString(str).split(/\s+/);
 
   const levenshtein = (s, t) => {
     if (!s.length || (!s && t)) return t.length;
     if (!t.length || (!t && s)) return s.length;
-    if (!t && !s) return 999;
     const arr = [];
     for (let i = 0; i <= t.length; i++) {
       arr[i] = [i];
@@ -85,6 +38,58 @@ export default function SearchResults(props) {
     }
     return arr[t.length][s.length];
   };
+
+  React.useEffect(() => {
+    if (books) {
+      const searchLower = normalizeString(searchTerm);
+
+      // Filter for exact matches
+      let nameFilteredExact = Object.values(books).filter((book) => {
+        const normalizedBookName = normalizeString(book.name);
+        return normalizedBookName.includes(searchLower);
+      });
+
+      // Filter for approximate matches
+      const searchWords = splitIntoWords(searchLower);
+
+      let nameFiltered = Object.values(books).filter((book) => {
+        const bookNameWords = splitIntoWords(book.name);
+        return bookNameWords.some((word) => {
+          return searchWords.some((searchWord) => {
+            const distance = levenshtein(word, searchWord);
+            return distance <= MIN_DISTANCE;
+          });
+        });
+      });
+
+      let authorFilteredExact = Object.values(books).filter((book) => {
+        return normalizeString(book.author).includes(searchLower);
+      });
+
+      let authorFiltered = Object.values(books).filter((book) => {
+        const authorNameWords = splitIntoWords(book.author);
+        return authorNameWords.some((word) => {
+          return searchWords.some((searchWord) => {
+            const distance = levenshtein(word, searchWord);
+            return distance <= MIN_DISTANCE;
+          });
+        });
+      });
+
+      const combinedFilter = [...nameFiltered, ...authorFiltered];
+      const uniqueBooks = Array.from(
+        new Set(combinedFilter.map((book) => book.id))
+      ).map((id) => combinedFilter.find((book) => book.id === id));
+
+      const combinedExact = [...nameFilteredExact, ...authorFilteredExact];
+      const uniqueExact = Array.from(
+        new Set(combinedExact.map((book) => book.id))
+      ).map((id) => combinedExact.find((book) => book.id === id));
+
+      setFilteredBooks(uniqueBooks);
+      setExactFilteredBooks(uniqueExact);
+    }
+  }, [searchTerm, books]);
 
   return (
     <div className="search-results outContainer">
@@ -108,8 +113,9 @@ export default function SearchResults(props) {
         </>
       )}
 
-      {filteredBooks?.length < 0 &&
-        exactFilteredBooks?.length < 0("За вашим запитом не знайдено книг")}
+      {filteredBooks?.length === 0 && exactFilteredBooks?.length === 0 && (
+        <p>За вашим запитом не знайдено книг</p>
+      )}
     </div>
   );
 }

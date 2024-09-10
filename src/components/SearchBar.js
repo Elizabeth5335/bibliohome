@@ -1,19 +1,24 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import { useBooks } from "../context/BooksContext";
 import { useNavigate } from "react-router-dom";
 
 export default function SearchBar() {
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [error, setError] = React.useState("");
   const navigate = useNavigate();
 
   function handleSearch(e) {
     e.preventDefault();
-    if (searchTerm !== "") {
-      navigate(`/books/${searchTerm}`);
+
+    if (searchTerm.trim() === "") {
+      setError("Спершу введіть назву або автора!");
+    } else if (searchTerm.length < 3) {
+      setError("Назва або автор повинні бути довші за 3 символи.");
     } else {
-      alert("Спершу введіть назву або автора!");
+      setError("");
+      const sanitizedSearchTerm = encodeURIComponent(searchTerm.trim());
+      navigate(`/books/${sanitizedSearchTerm}`);
     }
   }
 
@@ -31,7 +36,7 @@ export default function SearchBar() {
           <FontAwesomeIcon icon={faSearch} className="search-icon" />
         </button>
       </form>
-
+      {error && <p className="error-message">{error}</p>}
     </section>
   );
 }
