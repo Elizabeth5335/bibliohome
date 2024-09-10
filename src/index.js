@@ -16,6 +16,7 @@ import DeleteBook from "./components/DeleteBook";
 import SearchResults from "./components/SearchResults";
 import EditBookById from "./components/EditBookById";
 import NewBooks from "./components/NewBooks";
+import AuthorSearchResults from "./components/AuthorSearchResults";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,11 @@ const router = createBrowserRouter([
   {
     path: "/books/:age/:category",
     element: <CategorySearchResults />,
+  },
+
+  {
+    path: "/books/author/:author",
+    element: <AuthorSearchResults />,
   },
 
   {

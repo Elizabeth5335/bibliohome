@@ -47,9 +47,7 @@ export default function Book() {
   return (
     <div className="outContainer">
       <button
-        onClick={() => {
-          navigate(-1);
-        }}
+        onClick={() => navigate(-1)}
       >
         Назад
       </button>
@@ -71,7 +69,10 @@ export default function Book() {
             <b>Вартість прокату: {book.price} zł</b>
           </p>
           <p className="importantText">
-            <b>Автор:</b> {book.author}
+            <b>Автор: </b>
+            <Link to={`/books/author/${encodeURIComponent(book.author)}`}>
+              {book.author}
+            </Link>
           </p>
           {book.description && (
             <p>
@@ -80,7 +81,18 @@ export default function Book() {
             </p>
           )}
           <p>
-          <b>Категорія:</b> {Array.isArray(book.category) ? book.category.join('; ') : book.category}
+            <b>Категорія:</b> {Array.isArray(book.category) ? (
+              book.category.map((cat, index) => (
+                <span key={index}>
+                    {cat}
+                  {index < book.category.length - 1 && ', '}
+                </span>
+              ))
+            ) : (
+              <Link to={`/books/category/${encodeURIComponent(book.category)}`}>
+                {book.category}
+              </Link>
+            )}
           </p>
           {book?.additionalImages && (
             <div>
