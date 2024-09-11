@@ -41,6 +41,10 @@ export default function CategorySearchResults() {
         <h2>Книги категорії "{categories[age].find((cat) => cat.catId.toLowerCase() === category.toLowerCase())?.name}"</h2>
       )}
 
+      {categories && categories[age] && categories[age].find((cat) => cat.catId=="X") && (
+        <strong>Книги бонусної категорії можна брати напрокат безкоштовно, додатково до основного замовлення.</strong>
+      )}
+
       {filteredBooks.length > 0 ? (
         <BookList books={filteredBooks} />
       ) : (
