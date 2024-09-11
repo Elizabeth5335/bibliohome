@@ -6,7 +6,9 @@ function ImageModal({ src, alt, onClose }) {
   return (
     <div className="modal" onClick={onClose}>
       <div className="modal-content">
-        <span className="close" onClick={onClose}>&times;</span>
+        <span className="close" onClick={onClose}>
+          &times;
+        </span>
         <img src={src} alt={alt} className="modal-image" />
       </div>
     </div>
@@ -19,6 +21,7 @@ export default function Book() {
   const [book, setBook] = React.useState();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [selectedImage, setSelectedImage] = React.useState("");
+  const [relatedBooks, setRelatedBooks] = React.useState([]);
 
   const navigate = useNavigate();
 
@@ -26,12 +29,21 @@ export default function Book() {
     if (books) {
       const foundBook = Object.values(books).find((book) => book.id === bookId);
       setBook(foundBook);
+
+      if (foundBook?.series) {
+        const booksInSeries = Object.values(books).filter(
+          (b) => b.series === foundBook.series && b.id !== bookId
+        );
+        setRelatedBooks(booksInSeries);
+      }
     }
   }, [bookId, books]);
 
   const handleImageClick = (imageSrc) => {
-    setSelectedImage(imageSrc ||
-      "https://timvandevall.com/wp-content/uploads/2014/01/Book-Cover-Template.jpg");
+    setSelectedImage(
+      imageSrc ||
+        "https://timvandevall.com/wp-content/uploads/2014/01/Book-Cover-Template.jpg"
+    );
     setIsModalOpen(true);
   };
 
@@ -46,11 +58,7 @@ export default function Book() {
 
   return (
     <div className="outContainer">
-      <button
-        onClick={() => navigate(-1)}
-      >
-        Назад
-      </button>
+      <button onClick={() => navigate(-1)}>Назад</button>
       <div className="bookPage">
         <div>
           <img
@@ -81,11 +89,12 @@ export default function Book() {
             </p>
           )}
           <p>
-            <b>Категорія:</b> {Array.isArray(book.category) ? (
+            <b>Категорія:</b>{" "}
+            {Array.isArray(book.category) ? (
               book.category.map((cat, index) => (
                 <span key={index}>
-                    {cat}
-                  {index < book.category.length - 1 && ', '}
+                  {cat}
+                  {index < book.category.length - 1 && ", "}
                 </span>
               ))
             ) : (
@@ -108,10 +117,36 @@ export default function Book() {
               ))}
             </div>
           )}
+
+          {relatedBooks.length > 0 && (
+            <div className="related-books-section">
+              <h3>Інші книги з серії</h3>
+              <div className="related-books">
+                {relatedBooks.map((relatedBook) => (
+                  <div key={relatedBook.id} className="related-book-item">
+                    <Link to={`/book/${relatedBook.id}`}>
+                      <img
+                        src={
+                          relatedBook.url ||
+                          "https://timvandevall.com/wp-content/uploads/2014/01/Book-Cover-Template.jpg"
+                        }
+                        alt={relatedBook.name}
+                      />
+                      <p>{relatedBook.name}</p>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
       {isModalOpen && (
-        <ImageModal src={selectedImage} alt="Book Image" onClose={handleCloseModal} />
+        <ImageModal
+          src={selectedImage}
+          alt="Book Image"
+          onClose={handleCloseModal}
+        />
       )}
     </div>
   );

@@ -22,6 +22,7 @@ export default function EditBookById() {
   const [name, setName] = React.useState("");
   const [id, setId] = React.useState("");
   const [author, setAuthor] = React.useState("");
+  const [series, setSeries] = React.useState("");
   const [category, setCategory] = React.useState("");
   const [additionalCategories, setAdditionalCategories] = React.useState([]);
   const [description, setDescription] = React.useState("");
@@ -39,7 +40,6 @@ export default function EditBookById() {
         ...categories.adults.map(cat => ({ catId: cat.catId, name: cat.name })),
         ...categories.children.map(cat => ({ catId: cat.catId, name: cat.name })),
       ];
-            
       setMergedCats(merged);
       console.log("merged");
       console.log(merged);
@@ -54,6 +54,7 @@ export default function EditBookById() {
         setName(bookToEdit?.name);
         setId(bookToEdit?.id);
         setAuthor(bookToEdit?.author);
+        setSeries(bookToEdit?.series || "");
         setCategory(
           Array.isArray(bookToEdit?.category)
             ? bookToEdit.category[0]
@@ -106,9 +107,6 @@ export default function EditBookById() {
     
     return foundCat ? `${foundCat.catId}-${timestamp}`.slice(0, 9) : timestamp;
   };
-  
-  
-  
 
   const deleteImage = (index) => {
     setAdditionalImages(additionalImages.filter((_, i) => i !== index));
@@ -137,6 +135,7 @@ export default function EditBookById() {
         id,
         name,
         author,
+        series,
         description,
         category: [category, ...additionalCategories],
         forAdults: book.forAdults,
@@ -194,6 +193,14 @@ export default function EditBookById() {
                 type="text"
                 value={author}
                 onChange={(e) => setAuthor(e.target.value)}
+              />
+            </div>
+            <div className="form-field">
+              <label>Серія книги</label>
+              <input
+                type="text"
+                value={series}
+                onChange={(e) => setSeries(e.target.value)}
               />
             </div>
             <div className="form-field">
@@ -267,46 +274,72 @@ export default function EditBookById() {
                 }}
               />
               {coverImage && (
-                <img
-                  className="bookCoverDelete"
-                  src={URL.createObjectURL(coverImage)}
-                  alt={name}
-                />
+                <div className="uploaded-image">
+                  <img
+                    src={URL.createObjectURL(coverImage)}
+                    alt="Обкладинка"
+                    style={{ maxHeight: 150 }}
+                  />
+                </div>
               )}
-              {!coverImage && coverURL && (
-                <img className="bookCoverDelete" src={coverURL} alt={name} />
+              {coverURL && (
+                <div className="uploaded-image">
+                  <img src={coverURL} alt="Обкладинка" style={{ maxHeight: 150 }} />
+                </div>
               )}
             </div>
 
-            <div className="form-field images">
+            <div className="form-field additional-images">
               <label>Додаткові зображення</label>
               <input
                 type="file"
                 accept="image/*"
-                multiple
                 onChange={handleAdditionalImagesChange}
+                multiple
               />
-              {additionalImages.map((image, index) => (
-                <div key={`new-img${index}`} className="image-wrapper">
-                  <img
-                    className="bookCoverDelete"
-                    src={URL.createObjectURL(image)}
-                    alt={`new-img${index}`}
-                  />
-                  <button type="button" onClick={() => deleteImage(index)}>
-                    Видалити
-                  </button>
-                </div>
-              ))}
+              <div className="additional-images-previews">
+                {additionalImages.map((image, index) => (
+                  <div key={index} className="additional-image">
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt={`Additional Image ${index + 1}`}
+                      style={{ maxHeight: 100 }}
+                    />
+                    <button type="button" onClick={() => deleteImage(index)}>
+                      Видалити
+                    </button>
+                  </div>
+                ))}
+                {book &&
+                  book.additionalImages &&
+                  book.additionalImages.map((imageURL, index) => (
+                    <div key={index} className="additional-image">
+                      <img
+                        src={imageURL}
+                        alt={`Existing Additional Image ${index + 1}`}
+                        style={{ maxHeight: 100 }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => deleteExistingImage(index)}
+                      >
+                        Видалити
+                      </button>
+                    </div>
+                  ))}
+              </div>
+              <button type="button" onClick={addAdditionalImageURLField}>
+                Додати зображення за URL
+              </button>
               {additionalImageURLs.map((url, index) => (
-                <div key={`new-url${index}`} className="image-wrapper">
+                <div key={index} className="form-field">
                   <input
                     type="text"
                     value={url}
+                    placeholder="вставте посилання на зображення"
                     onChange={(e) =>
                       handleAdditionalImageURLChange(index, e.target.value)
                     }
-                    placeholder="вставте посилання на зображення"
                   />
                   <button
                     type="button"
@@ -316,29 +349,13 @@ export default function EditBookById() {
                   </button>
                 </div>
               ))}
-              <button type="button" onClick={addAdditionalImageURLField}>
-                Додати посилання на зображення
-              </button>
-              {book?.additionalImages?.map((image, index) => (
-                <div key={`existing-img${index}`} className="image-wrapper">
-                  <img
-                    className="bookCoverDelete"
-                    src={image}
-                    alt={`existing-img${index}`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => deleteExistingImage(index)}
-                  >
-                    Видалити
-                  </button>
-                </div>
-              ))}
             </div>
-
-            <button type="submit" disabled={loading}>
-              {loading ? "Оновлюється..." : "Зберегти зміни"}
-            </button>
+            <div className="buttons">
+              <button type="submit" disabled={loading}>
+                Зберегти
+              </button>
+              {loading && <p>Збереження...</p>}
+            </div>
           </form>
         </div>
       ) : (

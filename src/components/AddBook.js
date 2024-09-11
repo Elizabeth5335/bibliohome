@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ref, update, get } from "firebase/database";
+import { ref, update } from "firebase/database";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import NoAccessMessage from "./NoAccessMessage";
 import { useBooks } from "../context/BooksContext";
@@ -25,6 +25,8 @@ export default function AddBook() {
   const [coverURL, setCoverURL] = React.useState("");
   const [additionalImages, setAdditionalImages] = React.useState([]);
   const [additionalImageURLs, setAdditionalImageURLs] = React.useState([]);
+  
+  const [series, setSeries] = React.useState(""); // New state for book series
 
   const { categories, books } = useBooks();
   const [mergedCats, setMergedCats] = React.useState([]);
@@ -126,6 +128,7 @@ export default function AddBook() {
         description,
         category: [category, ...additionalCategories],
         forAdults,
+        series,  // Add series to the newBook object
         url: coverImageUrl,
         additionalImages: [...additionalImagesUrls, ...additionalImageURLs],
         price,
@@ -149,6 +152,7 @@ export default function AddBook() {
       setLoading(false);
       setCoverURL("");
       setAdditionalImageURLs([]);
+      setSeries("");  // Reset series field
 
       const coverInput = document.getElementById("coverImageInput");
       const additionalInput = document.getElementById("additionalImagesInput");
@@ -197,7 +201,7 @@ export default function AddBook() {
                 onChange={(e) => setAuthor(e.target.value)}
               />
             </div>
-            <div className="form-field price">
+            <div className="form-field">
               <label>Книга для дорослих?</label>
               <div>
                 <input
@@ -241,6 +245,15 @@ export default function AddBook() {
               />
             </div>
 
+            <div className="form-field">
+              <label>Серія книги</label>  {/* New input field for series */}
+              <input
+                type="text"
+                value={series}
+                onChange={(e) => setSeries(e.target.value)}
+                placeholder="введіть серію книги (якщо є)"
+              />
+            </div>
 
             <div className="form-field">
               <label>Опис</label>
@@ -251,90 +264,59 @@ export default function AddBook() {
               />
             </div>
             <div className="form-field price">
-              <label>Вартість прокату</label>
-              <div>
-                <input
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                />
-                <span>zł</span>
-              </div>
+              <label>Ціна</label>
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                min="0"
+              />
             </div>
-
-            <div className="form-field image">
+            <div className="form-field">
               <label>Обкладинка</label>
               <input
                 type="file"
-                accept="image/*"
+                id="coverImageInput"
                 onChange={handleCoverImageChange}
               />
-              або URL
               <input
-                type="text"
+                type="url"
+                placeholder="або введіть URL обкладинки"
                 value={coverURL}
-                placeholder="вставте посилання на зображення"
-                onChange={(e) => {
-                  setCoverImage(null);
-                  setCoverURL(e.target.value);
-                }}
+                onChange={(e) => setCoverURL(e.target.value)}
               />
-              {coverImage && (
-                <img
-                  className="bookCoverDelete"
-                  src={URL.createObjectURL(coverImage)}
-                  alt={name}
-                />
-              )}
-              {!coverImage && coverURL && (
-                <img className="bookCoverDelete" src={coverURL} alt={name} />
-              )}
             </div>
-
-            <div className="form-field images">
+            <div className="form-field">
               <label>Додаткові зображення</label>
               <input
                 type="file"
-                accept="image/*"
-                multiple
+                id="additionalImagesInput"
                 onChange={handleAdditionalImagesChange}
+                multiple
               />
-              {additionalImages.map((image, index) => (
-                <div key={`new-img${index}`} className="image-wrapper">
-                  <img
-                    className="bookCoverDelete"
-                    src={URL.createObjectURL(image)}
-                    alt={`new-img${index}`}
-                  />
-                  <button type="button" onClick={() => deleteImage(index)}>
-                    Видалити
-                  </button>
-                </div>
-              ))}
+            </div>
+
+            <div className="form-field">
+              <label>Додаткові URL зображень</label>
               {additionalImageURLs.map((url, index) => (
-                <div key={`new-url${index}`} className="image-wrapper">
+                <div key={index} style={{ display: "flex" }}>
                   <input
-                    type="text"
+                    type="url"
                     value={url}
-                    onChange={(e) =>
-                      handleAdditionalImageURLChange(index, e.target.value)
-                    }
-                    placeholder="вставте посилання на зображення"
+                    onChange={(e) => handleAdditionalImageURLChange(index, e.target.value)}
                   />
-                  <button
-                    type="button"
-                    onClick={() => removeAdditionalImageURLField(index)}
-                  >
+                  <button type="button" onClick={() => removeAdditionalImageURLField(index)}>
                     Видалити
                   </button>
                 </div>
               ))}
               <button type="button" onClick={addAdditionalImageURLField}>
-                Додати посилання на зображення
+                Додати поле для URL зображення
               </button>
             </div>
+
             <button type="submit" disabled={loading}>
-              {loading ? "Додається..." : "Додати книгу"}
+              {loading ? "Завантаження..." : "Додати книгу"}
             </button>
           </form>
         </div>
